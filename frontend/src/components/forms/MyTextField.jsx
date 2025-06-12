@@ -15,7 +15,7 @@ export default function MyTextField(props) {
             render={({
                 field: { onChange, value },
                 fieldState: { error },
-                formState,
+                //formState,
             }) => (  // ✅ Poprawka 2: Poprawna składnia arrow function
                 <TextField 
                     id="outlined-basic" 
