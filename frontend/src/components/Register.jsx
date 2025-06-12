@@ -27,6 +27,7 @@ const Register = () => {
     return (
         <div className={"myBackground"}> 
             <form onSubmit = {handleSubmit(submission)}>
+            
             <Box className={"whiteBox"}>
                 <Box className={"itemBox"}>
                     <Box className={"title"}>Register for Auth app</Box>

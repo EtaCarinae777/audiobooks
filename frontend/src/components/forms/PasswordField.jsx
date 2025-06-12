@@ -27,7 +27,7 @@ export default function PasswordField(props) {
             render={({
                 field: { onChange, value },
                 fieldState: { error },
-                formState,
+                //formState,
             }) => (
                 <FormControl variant="outlined" className={"myForm"}>
                 <InputLabel htmlFor="outlined-adornment-password">{label}</InputLabel>
