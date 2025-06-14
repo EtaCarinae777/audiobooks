@@ -1,49 +1,1899 @@
-.myBackground{
+/* Modern Login Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+.myBackground {
     width: 100vw;
     height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #000000;
-    background: radial-gradient(circle, rgba(0, 0, 0, 1) 0%, rgba(173, 2, 36, 1) 100%);
-}
-
-.whiteBox{
-    background-color: white;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #ff6b6b 100%);
+    position: relative;
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
     padding: 20px;
-    min-width: 300px;
-    height: 60%;
-    width: 25%;
-    border: 1px solid #333;
+    box-sizing: border-box;
 }
 
-.itemBox{
+/* Animated background effects */
+.myBackground::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(circle at 20% 80%, rgba(255, 107, 107, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(102, 126, 234, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(118, 75, 162, 0.2) 0%, transparent 50%);
+    animation: backgroundFloat 8s ease-in-out infinite;
+}
+
+@keyframes backgroundFloat {
+
+    0%,
+    100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-20px) rotate(2deg);
+    }
+}
+
+/* Floating particles */
+.myBackground::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image:
+        radial-gradient(2px 2px at 20px 30px, rgba(255, 255, 255, 0.15), transparent),
+        radial-gradient(2px 2px at 40px 70px, rgba(255, 255, 255, 0.1), transparent),
+        radial-gradient(1px 1px at 90px 40px, rgba(255, 255, 255, 0.1), transparent),
+        radial-gradient(1px 1px at 130px 80px, rgba(255, 255, 255, 0.1), transparent),
+        radial-gradient(2px 2px at 160px 30px, rgba(255, 255, 255, 0.1), transparent);
+    background-repeat: repeat;
+    background-size: 200px 100px;
+    animation: sparkle 20s linear infinite;
+}
+
+@keyframes sparkle {
+    from {
+        transform: translateY(0px);
+    }
+
+    to {
+        transform: translateY(-200px);
+    }
+}
+
+.whiteBox {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    padding: 40px;
+    min-width: 400px;
+    width: 100%;
+    max-width: 500px;
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.1),
+        0 0 80px rgba(102, 126, 234, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    position: relative;
+    z-index: 1;
+    animation: slideUpFade 1s ease-out;
+    transition: all 0.3s ease;
+    margin: 0 auto;
+}
+
+.whiteBox:hover {
+    transform: translateY(-5px);
+    box-shadow:
+        0 30px 60px rgba(0, 0, 0, 0.15),
+        0 0 100px rgba(102, 126, 234, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+@keyframes slideUpFade {
+    from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.itemBox {
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
-    background-color: rgb(255, 255, 255);
-    height: 80px;
+    background-color: transparent;
+    margin-bottom: 25px;
+    position: relative;
+    animation: itemFadeIn 0.8s ease-out forwards;
+    opacity: 0;
 }
 
-.title{
-    font-size: 30px;
-    color:rgb(153, 24, 24);
+.itemBox:nth-child(1) {
+    animation-delay: 0.2s;
 }
 
-.myForm, .myButton{
+.itemBox:nth-child(2) {
+    animation-delay: 0.4s;
+}
+
+.itemBox:nth-child(3) {
+    animation-delay: 0.6s;
+}
+
+.itemBox:nth-child(4) {
+    animation-delay: 0.8s;
+}
+
+.itemBox:nth-child(5) {
+    animation-delay: 1s;
+}
+
+@keyframes itemFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #ff6b6b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+    margin: 0;
+    padding: 20px 0;
+    position: relative;
+    animation: titleGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+    from {
+        filter: drop-shadow(0 0 10px rgba(102, 126, 234, 0.3));
+    }
+
+    to {
+        filter: drop-shadow(0 0 20px rgba(255, 107, 107, 0.4));
+    }
+}
+
+.title::after {
+    content: '';
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(135deg, #667eea, #ff6b6b);
+    border-radius: 2px;
+    animation: underlineExpand 2s ease-out;
+}
+
+@keyframes underlineExpand {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 60px;
+    }
+}
+
+/* Material-UI TextField Enhancements */
+.itemBox .MuiTextField-root {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.itemBox .MuiFormControl-root {
+    width: 100% !important;
+}
+
+.itemBox .MuiOutlinedInput-root {
+    border-radius: 12px !important;
+    background: rgba(102, 126, 234, 0.03) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative;
+    overflow: hidden;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    height: 56px !important;
+}
+
+.itemBox .MuiOutlinedInput-root::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+    transition: left 0.6s;
+}
+
+.itemBox .MuiOutlinedInput-root:hover::before {
+    left: 100%;
+}
+
+.itemBox .MuiOutlinedInput-root fieldset {
+    border-color: rgba(102, 126, 234, 0.3) !important;
+    border-width: 2px !important;
+    transition: all 0.3s ease !important;
+}
+
+.itemBox .MuiOutlinedInput-root:hover fieldset {
+    border-color: rgba(102, 126, 234, 0.6) !important;
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.1) !important;
+}
+
+.itemBox .MuiOutlinedInput-root.Mui-focused fieldset {
+    border-color: #667eea !important;
+    box-shadow: 0 0 25px rgba(102, 126, 234, 0.2) !important;
+}
+
+.itemBox .MuiInputLabel-root {
+    color: rgba(102, 126, 234, 0.8) !important;
+    font-weight: 500 !important;
+}
+
+.itemBox .MuiInputLabel-root.Mui-focused {
+    color: #667eea !important;
+}
+
+.itemBox .MuiInputBase-input {
+    color: #333 !important;
+    font-weight: 500 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Ensure all input fields have the same width and height */
+.itemBox .MuiInputBase-root {
+    width: 100% !important;
+    height: 56px !important;
+}
+
+.itemBox .MuiInputAdornment-root {
+    flex-shrink: 0 !important;
+}
+
+.itemBox .MuiTextField-root .MuiInputBase-root {
+    min-height: 56px !important;
+}
+
+/* Enhanced Button Styles */
+.myButton {
+    width: 100% !important;
+    height: 56px !important;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    border-radius: 12px !important;
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    text-transform: none !important;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    border: none !important;
+}
+
+.myButton::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s;
+}
+
+.myButton:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #ff6b6b 100%) !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 12px 35px rgba(118, 75, 162, 0.4) !important;
+}
+
+.myButton:hover::before {
+    left: 100%;
+}
+
+.myButton:active {
+    transform: translateY(-1px) !important;
+}
+
+/* Link Styles */
+.myLink {
+    color: #667eea !important;
+    text-decoration: none !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    position: relative !important;
+    transition: all 0.3s ease !important;
+    padding: 10px 0 !important;
+}
+
+.myLink::after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background: linear-gradient(135deg, #667eea, #ff6b6b);
+    border-radius: 1px;
+    transition: width 0.3s ease;
+}
+
+.myLink:hover {
+    color: #ff6b6b !important;
+    text-shadow: 0 0 10px rgba(255, 107, 107, 0.3) !important;
+}
+
+.myLink:hover::after {
     width: 100%;
 }
 
-.myButton{
-    background-color: red !important ;
+/* Form animation */
+form {
+    width: 100%;
 }
 
-.myButton:hover{
-    background-color: darkred !important;
+/* Responsive design */
+@media (max-width: 768px) {
+    .myBackground {
+        padding: 10px;
+    }
+
+    .whiteBox {
+        min-width: 280px;
+        width: 100%;
+        max-width: 400px;
+        padding: 30px 20px;
+    }
+
+    .title {
+        font-size: 2rem;
+    }
+
+    .itemBox {
+        margin-bottom: 20px;
+    }
 }
 
-.myLink{
-    color: rgb(153, 24, 24);
-    text-decoration:wavy;  
+@media (min-width: 769px) {
+    .whiteBox {
+        width: 450px;
+    }
+}
+
+/* Loading animation for buttons */
+.myButton.loading {
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.myButton.loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 2px solid transparent;
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes spin {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+
+    100% {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+/* Focus styles for accessibility */
+.myButton:focus-visible,
+.myLink:focus-visible {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+
+/* Global App Bar Styling */
+.MuiAppBar-root {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    backdrop-filter: blur(20px) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.2) !important;
+    transition: all 0.3s ease !important;
+}
+
+.MuiAppBar-root:hover {
+    box-shadow: 0 12px 40px rgba(102, 126, 234, 0.3) !important;
+}
+
+/* Toolbar Styling */
+.MuiToolbar-root {
+    min-height: 70px !important;
+    padding: 0 24px !important;
+}
+
+.MuiToolbar-root .MuiTypography-h6 {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 1.4rem !important;
+    background: linear-gradient(45deg, #ffffff 0%, #f0f8ff 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    text-shadow: 0 2px 10px rgba(255, 255, 255, 0.1) !important;
+    position: relative !important;
+}
+
+.MuiToolbar-root .MuiTypography-h6::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #ffffff, transparent);
+    border-radius: 2px;
+    animation: titleUnderline 2s ease-out;
+}
+
+@keyframes titleUnderline {
+    from { width: 0; opacity: 0; }
+    to { width: 60px; opacity: 1; }
+}
+
+/* Drawer Styling */
+.MuiDrawer-root .MuiDrawer-paper {
+    background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%) !important;
+    border-right: 1px solid rgba(102, 126, 234, 0.1) !important;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.05) !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+/* Drawer Background Effects */
+.MuiDrawer-root .MuiDrawer-paper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 20%, rgba(102, 126, 234, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* List Styling */
+.MuiDrawer-root .MuiList-root {
+    padding: 16px 8px !important;
+    position: relative;
+    z-index: 1;
+}
+
+/* List Item Styling */
+.MuiDrawer-root .MuiListItem-root {
+    margin-bottom: 8px !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    transition: all 0.3s ease !important;
+}
+
+.MuiDrawer-root .MuiListItemButton-root {
+    border-radius: 12px !important;
+    padding: 12px 16px !important;
+    margin: 0 !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    background: transparent !important;
+}
+
+/* Hover Effects */
+.MuiDrawer-root .MuiListItemButton-root:hover {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%) !important;
+    transform: translateX(4px) !important;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15) !important;
+}
+
+/* Selected Item Styling */
+.MuiDrawer-root .MuiListItemButton-root.Mui-selected {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3) !important;
+    transform: translateX(6px) !important;
+}
+
+.MuiDrawer-root .MuiListItemButton-root.Mui-selected:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%) !important;
+    transform: translateX(8px) !important;
+    box-shadow: 0 12px 35px rgba(118, 75, 162, 0.4) !important;
+}
+
+/* Selected Item Glow Effect */
+.MuiDrawer-root .MuiListItemButton-root.Mui-selected::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.6s;
+}
+
+.MuiDrawer-root .MuiListItemButton-root.Mui-selected:hover::before {
+    left: 100%;
+}
+
+/* List Item Icon Styling */
+.MuiDrawer-root .MuiListItemIcon-root {
+    min-width: 40px !important;
+    color: #64748b !important;
+    transition: all 0.3s ease !important;
+}
+
+.MuiDrawer-root .MuiListItemButton-root:hover .MuiListItemIcon-root {
+    color: #667eea !important;
+    transform: scale(1.1) !important;
+}
+
+.MuiDrawer-root .MuiListItemButton-root.Mui-selected .MuiListItemIcon-root {
+    color: white !important;
+    transform: scale(1.15) !important;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)) !important;
+}
+
+/* List Item Text Styling */
+.MuiDrawer-root .MuiListItemText-root .MuiTypography-root {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 500 !important;
+    font-size: 0.95rem !important;
+    color: #475569 !important;
+    transition: all 0.3s ease !important;
+}
+
+.MuiDrawer-root .MuiListItemButton-root:hover .MuiListItemText-root .MuiTypography-root {
+    color: #667eea !important;
+    font-weight: 600 !important;
+}
+
+.MuiDrawer-root .MuiListItemButton-root.Mui-selected .MuiListItemText-root .MuiTypography-root {
+    color: white !important;
+    font-weight: 600 !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
+}
+
+/* Divider Styling */
+.MuiDrawer-root .MuiDivider-root {
+    background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.2), transparent) !important;
+    height: 1px !important;
+    margin: 8px 16px !important;
+    border: none !important;
+}
+
+/* Main Content Area */
+.MuiBox-root[component="main"] {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+    min-height: 100vh !important;
+    position: relative !important;
+}
+
+.MuiBox-root[component="main"]::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 240px;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 70% 20%, rgba(102, 126, 234, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 20% 80%, rgba(118, 75, 162, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* Active Link Indicator */
+.MuiDrawer-root .MuiListItemButton-root.Mui-selected::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 60%;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 2px 0 0 2px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .MuiDrawer-root .MuiDrawer-paper {
+        width: 200px !important;
+    }
+    
+    .MuiAppBar-root {
+        width: calc(100% - 200px) !important;
+        margin-left: 200px !important;
+    }
+    
+    .MuiBox-root[component="main"]::before {
+        left: 200px !important;
+    }
+}
+
+/* Loading Animation for Smooth Transitions */
+.MuiDrawer-root .MuiListItemButton-root {
+    animation: slideInLeft 0.5s ease-out;
+}
+
+.MuiDrawer-root .MuiListItem-root:nth-child(1) .MuiListItemButton-root {
+    animation-delay: 0.1s;
+}
+
+.MuiDrawer-root .MuiListItem-root:nth-child(2) .MuiListItemButton-root {
+    animation-delay: 0.2s;
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Scroll Bar Styling for Drawer */
+.MuiDrawer-root .MuiDrawer-paper::-webkit-scrollbar {
+    width: 6px;
+}
+
+.MuiDrawer-root .MuiDrawer-paper::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 3px;
+}
+
+.MuiDrawer-root .MuiDrawer-paper::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 3px;
+}
+
+.MuiDrawer-root .MuiDrawer-paper::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #764ba2, #667eea);
+}
+
+/* Focus States for Accessibility */
+.MuiDrawer-root .MuiListItemButton-root:focus-visible {
+    outline: 2px solid #667eea !important;
+    outline-offset: 2px !important;
+}
+
+/* Brand Enhancement */
+.MuiToolbar-root .MuiTypography-h6 {
+    position: relative;
+    display: inline-block;
+}
+
+.MuiToolbar-root .MuiTypography-h6:hover {
+    animation: brandPulse 2s ease-in-out infinite;
+}
+
+@keyframes brandPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+
+
+/* Dark theme by default - similar to audiobook app */
+.MuiDrawer-root .MuiDrawer-paper {
+    background: linear-gradient(180deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%) !important;
+    border-right: 1px solid rgba(139, 92, 246, 0.1) !important;
+    box-shadow: 4px 0 30px rgba(0, 0, 0, 0.3) !important;
+    width: 280px !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+/* Animated background effects similar to audiobook app */
+.MuiDrawer-root .MuiDrawer-paper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    animation: backgroundPulse 8s ease-in-out infinite;
+}
+
+@keyframes backgroundPulse {
+    0%, 100% { opacity: 0.8; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
+}
+
+/* App Bar - Dark theme with gradient */
+.MuiAppBar-root {
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #8b5cf6 100%) !important;
+    backdrop-filter: blur(20px) !important;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.2) !important;
+    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.15) !important;
+    transition: all 0.3s ease !important;
+}
+
+.MuiAppBar-root:hover {
+    box-shadow: 0 12px 40px rgba(139, 92, 246, 0.25) !important;
+}
+
+/* Toolbar styling */
+.MuiToolbar-root {
+    min-height: 80px !important;
+    padding: 0 32px !important;
+    position: relative !important;
+}
+
+.MuiToolbar-root::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.1), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.MuiToolbar-root:hover::before {
+    opacity: 1;
+}
+
+/* App title - gradient text like audiobook app */
+.MuiToolbar-root .MuiTypography-h6 {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-weight: 800 !important;
+    font-size: 1.6rem !important;
+    background: linear-gradient(135deg, #ffffff 0%, #8b5cf6 50%, #ec4899 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    position: relative !important;
+    letter-spacing: -0.5px !important;
+}
+
+.MuiToolbar-root .MuiTypography-h6::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, #8b5cf6, #ec4899, transparent);
+    border-radius: 2px;
+    animation: titleUnderlineGlow 3s ease-in-out infinite;
+}
+
+@keyframes titleUnderlineGlow {
+    0%, 100% { 
+        opacity: 0.6;
+        transform: scaleX(1);
+        box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+    }
+    50% { 
+        opacity: 1;
+        transform: scaleX(1.1);
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.6);
+    }
+}
+
+/* Sidebar brand section */
+.MuiDrawer-root .MuiToolbar-root {
+    justify-content: flex-start !important;
+    padding: 24px !important;
+    background: rgba(139, 92, 246, 0.1) !important;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.2) !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* List styling - similar to audiobook app */
+.MuiDrawer-root .MuiList-root {
+    padding: 24px 16px !important;
+    position: relative;
+    z-index: 1;
+    flex-grow: 1;
+}
+
+/* List items with audiobook app styling */
+.MuiDrawer-root .MuiListItem-root {
+    margin-bottom: 12px !important;
+    border-radius: 16px !important;
+    overflow: hidden !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+}
+
+/* List item buttons */
+.MuiDrawer-root .MuiListItemButton-root {
+    border-radius: 16px !important;
+    padding: 16px 20px !important;
+    margin: 0 !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    background: transparent !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Hover effect - similar to audiobook app */
+.MuiDrawer-root .MuiListItemButton-root:hover {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(236, 72, 153, 0.1) 100%) !important;
+    transform: translateX(8px) scale(1.02) !important;
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.2) !important;
+    color: rgba(255, 255, 255, 1) !important;
+}
+
+/* Active/Selected state - purple gradient like audiobook app */
+.MuiDrawer-root .MuiListItemButton-root.Mui-selected {
+    background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #ec4899 100%) !important;
+    color: white !important;
+    box-shadow: 0 12px 30px rgba(139, 92, 246, 0.4) !important;
+    transform: translateX(12px) scale(1.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.MuiDrawer-root .MuiListItemButton-root.Mui-selected:hover {
+    background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 50%, #ec4899 100%) !important;
+    transform: translateX(16px) scale(1.08) !important;
+    box-shadow: 0 16px 40px rgba(139, 92, 246, 0.5) !important;
+}
+
+/* Animated light sweep effect */
+.MuiDrawer-root .MuiListItemButton-root::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    transition: left 0.6s ease;
+}
+
+.MuiDrawer-root .MuiListItemButton-root:hover::before {
+    left: 100%;
+}
+
+/* Active item indicator - glowing right border */
+.MuiDrawer-root .MuiListItemButton-root.Mui-selected::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 20%;
+    bottom: 20%;
+    width: 4px;
+    background: linear-gradient(180deg, #ffffff, rgba(255, 255, 255, 0.5), #ffffff);
+    border-radius: 2px 0 0 2px;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+    animation: activeGlow 2s ease-in-out infinite;
+}
+
+@keyframes activeGlow {
+    0%, 100% { opacity: 0.8; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.2); }
+}
+
+/* Icons styling */
+.MuiDrawer-root .MuiListItemIcon-root {
+    min-width: 48px !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+    transition: all 0.3s ease !important;
+}
+
+.MuiDrawer-root .MuiListItemButton-root:hover .MuiListItemIcon-root {
+    color: rgba(255, 255, 255, 1) !important;
+    transform: scale(1.15) rotate(5deg) !important;
+    filter: drop-shadow(0 4px 8px rgba(139, 92, 246, 0.3)) !important;
+}
+
+.MuiDrawer-root .MuiListItemButton-root.Mui-selected .MuiListItemIcon-root {
+    color: white !important;
+    transform: scale(1.2) !important;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3)) !important;
+}
+
+/* Text styling */
+.MuiDrawer-root .MuiListItemText-root .MuiTypography-root {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    color: inherit !important;
+    transition: all 0.3s ease !important;
+    letter-spacing: 0.5px !important;
+}
+
+.MuiDrawer-root .MuiListItemButton-root:hover .MuiListItemText-root .MuiTypography-root {
+    font-weight: 700 !important;
+    text-shadow: 0 2px 8px rgba(139, 92, 246, 0.3) !important;
+}
+
+.MuiDrawer-root .MuiListItemButton-root.Mui-selected .MuiListItemText-root .MuiTypography-root {
+    font-weight: 700 !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+}
+
+/* Divider with gradient */
+.MuiDrawer-root .MuiDivider-root {
+    background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.3), rgba(236, 72, 153, 0.2), transparent) !important;
+    height: 1px !important;
+    margin: 16px 20px !important;
+    border: none !important;
+    animation: dividerPulse 4s ease-in-out infinite;
+}
+
+@keyframes dividerPulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+/* Main content area - dark theme */
+.MuiBox-root[component="main"] {
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 30%, #16213e 100%) !important;
+    min-height: 100vh !important;
+    position: relative !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.MuiBox-root[component="main"]::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 280px;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 70% 20%, rgba(139, 92, 246, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 20% 80%, rgba(236, 72, 153, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 80% 60%, rgba(59, 130, 246, 0.04) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: -1;
+    animation: mainBackgroundFloat 12s ease-in-out infinite;
+}
+
+@keyframes mainBackgroundFloat {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    33% { transform: translate(-10px, -15px) rotate(1deg); }
+    66% { transform: translate(10px, -10px) rotate(-1deg); }
+}
+
+/* Entrance animations */
+.MuiDrawer-root .MuiListItemButton-root {
+    animation: slideInFromLeft 0.6s ease-out;
+}
+
+.MuiDrawer-root .MuiListItem-root:nth-child(1) .MuiListItemButton-root {
+    animation-delay: 0.1s;
+}
+
+.MuiDrawer-root .MuiListItem-root:nth-child(2) .MuiListItemButton-root {
+    animation-delay: 0.2s;
+}
+
+.MuiDrawer-root .MuiListItem-root:nth-child(3) .MuiListItemButton-root {
+    animation-delay: 0.3s;
+}
+
+.MuiDrawer-root .MuiListItem-root:nth-child(4) .MuiListItemButton-root {
+    animation-delay: 0.4s;
+}
+
+@keyframes slideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+/* Scrollbar styling for dark theme */
+.MuiDrawer-root .MuiDrawer-paper::-webkit-scrollbar {
+    width: 8px;
+}
+
+.MuiDrawer-root .MuiDrawer-paper::-webkit-scrollbar-track {
+    background: rgba(139, 92, 246, 0.1);
+    border-radius: 4px;
+}
+
+.MuiDrawer-root .MuiDrawer-paper::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #8b5cf6, #ec4899);
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+}
+
+.MuiDrawer-root .MuiDrawer-paper::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #a855f7, #f472b6);
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+}
+
+/* Focus states for accessibility */
+.MuiDrawer-root .MuiListItemButton-root:focus-visible {
+    outline: 2px solid #8b5cf6 !important;
+    outline-offset: 4px !important;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.4) !important;
+}
+
+/* Bottom section for upgrade button or additional content */
+.MuiDrawer-root .MuiList-root:last-child {
+    margin-top: auto;
+    padding-top: 0 !important;
+    border-top: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .MuiDrawer-root .MuiDrawer-paper {
+        width: 240px !important;
+    }
+    
+    .MuiAppBar-root {
+        width: calc(100% - 240px) !important;
+        margin-left: 240px !important;
+    }
+    
+    .MuiBox-root[component="main"]::before {
+        left: 240px !important;
+    }
+    
+    .MuiDrawer-root .MuiListItemButton-root {
+        padding: 12px 16px !important;
+    }
+    
+    .MuiDrawer-root .MuiListItemIcon-root {
+        min-width: 40px !important;
+    }
+}
+
+/* Dark theme by default - similar to audiobook app */
+.MuiDrawer-root .MuiDrawer-paper {
+    background: linear-gradient(180deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%) !important;
+    border-right: 1px solid rgba(139, 92, 246, 0.1) !important;
+    box-shadow: 4px 0 30px rgba(0, 0, 0, 0.3) !important;
+    width: 240px !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+/* Animated background effects similar to audiobook app */
+.MuiDrawer-root .MuiDrawer-paper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    animation: backgroundPulse 8s ease-in-out infinite;
+}
+
+@keyframes backgroundPulse {
+    0%, 100% { opacity: 0.8; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
+}
+
+/* App Bar - Dark theme with gradient */
+.MuiAppBar-root {
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #8b5cf6 100%) !important;
+    backdrop-filter: blur(20px) !important;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.2) !important;
+    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.15) !important;
+    transition: all 0.3s ease !important;
+}
+
+.MuiAppBar-root:hover {
+    box-shadow: 0 12px 40px rgba(139, 92, 246, 0.25) !important;
+}
+
+/* Toolbar styling */
+.MuiToolbar-root {
+    min-height: 64px !important;
+    padding: 0 24px !important;
+    position: relative !important;
+}
+
+.MuiToolbar-root::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.1), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.MuiToolbar-root:hover::before {
+    opacity: 1;
+}
+
+/* App title - gradient text like audiobook app */
+.MuiToolbar-root .MuiTypography-h6 {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 1.3rem !important;
+    background: linear-gradient(135deg, #ffffff 0%, #8b5cf6 50%, #ec4899 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    position: relative !important;
+    letter-spacing: -0.3px !important;
+}
+
+.MuiToolbar-root .MuiTypography-h6::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, #8b5cf6, #ec4899, transparent);
+    border-radius: 1px;
+    animation: titleUnderlineGlow 3s ease-in-out infinite;
+}
+
+@keyframes titleUnderlineGlow {
+    0%, 100% { 
+        opacity: 0.6;
+        transform: scaleX(1);
+        box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+    }
+    50% { 
+        opacity: 1;
+        transform: scaleX(1.1);
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.6);
+    }
+}
+
+/* Sidebar brand section */
+.MuiDrawer-root .MuiToolbar-root {
+    justify-content: flex-start !important;
+    padding: 16px 20px !important;
+    background: rgba(139, 92, 246, 0.1) !important;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.2) !important;
+    position: relative !important;
+    z-index: 1 !important;
+    min-height: 64px !important;
+}
+
+/* List styling - similar to audiobook app */
+.MuiDrawer-root .MuiList-root {
+    padding: 16px 12px !important;
+    position: relative;
+    z-index: 1;
+    flex-grow: 1;
+}
+
+/* List items with audiobook app styling */
+.MuiDrawer-root .MuiListItem-root {
+    margin-bottom: 8px !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+}
+
+/* List item buttons */
+.MuiDrawer-root .MuiListItemButton-root {
+    border-radius: 12px !important;
+    padding: 12px 16px !important;
+    margin: 0 !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    background: transparent !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Hover effect - similar to audiobook app */
+.MuiDrawer-root .MuiListItemButton-root:hover {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(236, 72, 153, 0.1) 100%) !important;
+    transform: translateX(6px) scale(1.02) !important;
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.2) !important;
+    color: rgba(255, 255, 255, 1) !important;
+}
+
+/* Active/Selected state - purple gradient like audiobook app */
+.MuiDrawer-root .MuiListItemButton-root.Mui-selected {
+    background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #ec4899 100%) !important;
+    color: white !important;
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4) !important;
+    transform: translateX(8px) scale(1.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.MuiDrawer-root .MuiListItemButton-root.Mui-selected:hover {
+    background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 50%, #ec4899 100%) !important;
+    transform: translateX(10px) scale(1.05) !important;
+    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.5) !important;
+}
+
+/* Animated light sweep effect */
+.MuiDrawer-root .MuiListItemButton-root::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    transition: left 0.6s ease;
+}
+
+.MuiDrawer-root .MuiListItemButton-root:hover::before {
+    left: 100%;
+}
+
+/* Active item indicator - glowing right border */
+.MuiDrawer-root .MuiListItemButton-root.Mui-selected::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 20%;
+    bottom: 20%;
+    width: 4px;
+    background: linear-gradient(180deg, #ffffff, rgba(255, 255, 255, 0.5), #ffffff);
+    border-radius: 2px 0 0 2px;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+    animation: activeGlow 2s ease-in-out infinite;
+}
+
+@keyframes activeGlow {
+    0%, 100% { opacity: 0.8; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.2); }
+}
+
+/* Icons styling */
+.MuiDrawer-root .MuiListItemIcon-root {
+    min-width: 40px !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+    transition: all 0.3s ease !important;
+}
+
+.MuiDrawer-root .MuiListItemButton-root:hover .MuiListItemIcon-root {
+    color: rgba(255, 255, 255, 1) !important;
+    transform: scale(1.15) rotate(5deg) !important;
+    filter: drop-shadow(0 4px 8px rgba(139, 92, 246, 0.3)) !important;
+}
+
+.MuiDrawer-root .MuiListItemButton-root.Mui-selected .MuiListItemIcon-root {
+    color: white !important;
+    transform: scale(1.2) !important;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3)) !important;
+}
+
+/* Text styling */
+.MuiDrawer-root .MuiListItemText-root .MuiTypography-root {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-weight: 500 !important;
+    font-size: 0.95rem !important;
+    color: inherit !important;
+    transition: all 0.3s ease !important;
+    letter-spacing: 0.3px !important;
+}
+
+.MuiDrawer-root .MuiListItemButton-root:hover .MuiListItemText-root .MuiTypography-root {
+    font-weight: 700 !important;
+    text-shadow: 0 2px 8px rgba(139, 92, 246, 0.3) !important;
+}
+
+.MuiDrawer-root .MuiListItemButton-root.Mui-selected .MuiListItemText-root .MuiTypography-root {
+    font-weight: 700 !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+}
+
+/* Divider with gradient */
+.MuiDrawer-root .MuiDivider-root {
+    background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.3), rgba(236, 72, 153, 0.2), transparent) !important;
+    height: 1px !important;
+    margin: 16px 20px !important;
+    border: none !important;
+    animation: dividerPulse 4s ease-in-out infinite;
+}
+
+@keyframes dividerPulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+/* Main content area - dark theme */
+.MuiBox-root[component="main"] {
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 30%, #16213e 100%) !important;
+    min-height: 100vh !important;
+    position: relative !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.MuiBox-root[component="main"]::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 240px;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 70% 20%, rgba(139, 92, 246, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 20% 80%, rgba(236, 72, 153, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 80% 60%, rgba(59, 130, 246, 0.04) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: -1;
+    animation: mainBackgroundFloat 12s ease-in-out infinite;
+}
+
+@keyframes mainBackgroundFloat {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    33% { transform: translate(-10px, -15px) rotate(1deg); }
+    66% { transform: translate(10px, -10px) rotate(-1deg); }
+}
+
+/* Entrance animations */
+.MuiDrawer-root .MuiListItemButton-root {
+    animation: slideInFromLeft 0.6s ease-out;
+}
+
+.MuiDrawer-root .MuiListItem-root:nth-child(1) .MuiListItemButton-root {
+    animation-delay: 0.1s;
+}
+
+.MuiDrawer-root .MuiListItem-root:nth-child(2) .MuiListItemButton-root {
+    animation-delay: 0.2s;
+}
+
+.MuiDrawer-root .MuiListItem-root:nth-child(3) .MuiListItemButton-root {
+    animation-delay: 0.3s;
+}
+
+.MuiDrawer-root .MuiListItem-root:nth-child(4) .MuiListItemButton-root {
+    animation-delay: 0.4s;
+}
+
+@keyframes slideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+/* Scrollbar styling for dark theme */
+.MuiDrawer-root .MuiDrawer-paper::-webkit-scrollbar {
+    width: 8px;
+}
+
+.MuiDrawer-root .MuiDrawer-paper::-webkit-scrollbar-track {
+    background: rgba(139, 92, 246, 0.1);
+    border-radius: 4px;
+}
+
+.MuiDrawer-root .MuiDrawer-paper::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #8b5cf6, #ec4899);
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+}
+
+.MuiDrawer-root .MuiDrawer-paper::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #a855f7, #f472b6);
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+}
+
+/* Focus states for accessibility */
+.MuiDrawer-root .MuiListItemButton-root:focus-visible {
+    outline: 2px solid #8b5cf6 !important;
+    outline-offset: 4px !important;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.4) !important;
+}
+
+/* Bottom section for upgrade button or additional content */
+.MuiDrawer-root .MuiList-root:last-child {
+    margin-top: auto;
+    padding-top: 0 !important;
+    border-top: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .MuiDrawer-root .MuiDrawer-paper {
+        width: 240px !important;
+    }
+    
+    .MuiAppBar-root {
+        width: calc(100% - 240px) !important;
+        margin-left: 240px !important;
+    }
+    
+    .MuiBox-root[component="main"]::before {
+        left: 240px !important;
+    }
+    
+    .MuiDrawer-root .MuiListItemButton-root {
+        padding: 12px 16px !important;
+    }
+    
+    .MuiDrawer-root .MuiListItemIcon-root {
+        min-width: 40px !important;
+    }
+}
+
+/* Dark theme by default - similar to audiobook app */
+.MuiDrawer-root .MuiDrawer-paper {
+    background: linear-gradient(180deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%) !important;
+    border-right: 1px solid rgba(139, 92, 246, 0.1) !important;
+    box-shadow: 4px 0 30px rgba(0, 0, 0, 0.3) !important;
+    width: 240px !important;
+    position: fixed !important;
+    overflow: hidden !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    height: 100vh !important;
+}
+
+/* Animated background effects similar to audiobook app */
+.MuiDrawer-root .MuiDrawer-paper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    animation: backgroundPulse 8s ease-in-out infinite;
+}
+
+@keyframes backgroundPulse {
+
+    0%,
+    100% {
+        opacity: 0.8;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+}
+
+/* App Bar - Dark theme with gradient */
+.MuiAppBar-root {
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #8b5cf6 100%) !important;
+    backdrop-filter: blur(20px) !important;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.2) !important;
+    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.15) !important;
+    transition: all 0.3s ease !important;
+}
+
+.MuiAppBar-root:hover {
+    box-shadow: 0 12px 40px rgba(139, 92, 246, 0.25) !important;
+}
+
+/* Toolbar styling */
+.MuiToolbar-root {
+    min-height: 64px !important;
+    padding: 0 24px !important;
+    position: relative !important;
+}
+
+.MuiToolbar-root::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.1), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.MuiToolbar-root:hover::before {
+    opacity: 1;
+}
+
+/* App title - gradient text like audiobook app */
+.MuiToolbar-root .MuiTypography-h6 {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 1.3rem !important;
+    background: linear-gradient(135deg, #ffffff 0%, #8b5cf6 50%, #ec4899 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    position: relative !important;
+    letter-spacing: -0.3px !important;
+}
+
+.MuiToolbar-root .MuiTypography-h6::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, #8b5cf6, #ec4899, transparent);
+    border-radius: 1px;
+    animation: titleUnderlineGlow 3s ease-in-out infinite;
+}
+
+@keyframes titleUnderlineGlow {
+
+    0%,
+    100% {
+        opacity: 0.6;
+        transform: scaleX(1);
+        box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scaleX(1.1);
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.6);
+    }
+}
+
+/* Sidebar brand section */
+.MuiDrawer-root .MuiToolbar-root {
+    justify-content: flex-start !important;
+    padding: 16px 20px !important;
+    background: rgba(139, 92, 246, 0.1) !important;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.2) !important;
+    position: relative !important;
+    z-index: 1 !important;
+    min-height: 64px !important;
+}
+
+/* List styling - similar to audiobook app */
+.MuiDrawer-root .MuiList-root {
+    padding: 16px 12px !important;
+    position: relative;
+    z-index: 1;
+    flex-grow: 1;
+}
+
+/* List items with audiobook app styling */
+.MuiDrawer-root .MuiListItem-root {
+    margin-bottom: 8px !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+}
+
+/* List item buttons */
+.MuiDrawer-root .MuiListItemButton-root {
+    border-radius: 12px !important;
+    padding: 12px 16px !important;
+    margin: 0 !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    background: transparent !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Hover effect - similar to audiobook app */
+.MuiDrawer-root .MuiListItemButton-root:hover {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(236, 72, 153, 0.1) 100%) !important;
+    transform: translateX(6px) scale(1.02) !important;
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.2) !important;
+    color: rgba(255, 255, 255, 1) !important;
+}
+
+/* Active/Selected state - purple gradient like audiobook app */
+.MuiDrawer-root .MuiListItemButton-root.Mui-selected {
+    background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #ec4899 100%) !important;
+    color: white !important;
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4) !important;
+    transform: translateX(8px) scale(1.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.MuiDrawer-root .MuiListItemButton-root.Mui-selected:hover {
+    background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 50%, #ec4899 100%) !important;
+    transform: translateX(10px) scale(1.05) !important;
+    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.5) !important;
+}
+
+/* Animated light sweep effect */
+.MuiDrawer-root .MuiListItemButton-root::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    transition: left 0.6s ease;
+}
+
+.MuiDrawer-root .MuiListItemButton-root:hover::before {
+    left: 100%;
+}
+
+/* Active item indicator - glowing right border */
+.MuiDrawer-root .MuiListItemButton-root.Mui-selected::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 20%;
+    bottom: 20%;
+    width: 4px;
+    background: linear-gradient(180deg, #ffffff, rgba(255, 255, 255, 0.5), #ffffff);
+    border-radius: 2px 0 0 2px;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+    animation: activeGlow 2s ease-in-out infinite;
+}
+
+@keyframes activeGlow {
+
+    0%,
+    100% {
+        opacity: 0.8;
+        transform: scaleY(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scaleY(1.2);
+    }
+}
+
+/* Icons styling */
+.MuiDrawer-root .MuiListItemIcon-root {
+    min-width: 40px !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+    transition: all 0.3s ease !important;
+}
+
+.MuiDrawer-root .MuiListItemButton-root:hover .MuiListItemIcon-root {
+    color: rgba(255, 255, 255, 1) !important;
+    transform: scale(1.15) rotate(5deg) !important;
+    filter: drop-shadow(0 4px 8px rgba(139, 92, 246, 0.3)) !important;
+}
+
+.MuiDrawer-root .MuiListItemButton-root.Mui-selected .MuiListItemIcon-root {
+    color: white !important;
+    transform: scale(1.2) !important;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3)) !important;
+}
+
+/* Text styling */
+.MuiDrawer-root .MuiListItemText-root .MuiTypography-root {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-weight: 500 !important;
+    font-size: 0.95rem !important;
+    color: inherit !important;
+    transition: all 0.3s ease !important;
+    letter-spacing: 0.3px !important;
+}
+
+.MuiDrawer-root .MuiListItemButton-root:hover .MuiListItemText-root .MuiTypography-root {
+    font-weight: 700 !important;
+    text-shadow: 0 2px 8px rgba(139, 92, 246, 0.3) !important;
+}
+
+.MuiDrawer-root .MuiListItemButton-root.Mui-selected .MuiListItemText-root .MuiTypography-root {
+    font-weight: 700 !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Divider with gradient */
+.MuiDrawer-root .MuiDivider-root {
+    background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.3), rgba(236, 72, 153, 0.2), transparent) !important;
+    height: 1px !important;
+    margin: 16px 20px !important;
+    border: none !important;
+    animation: dividerPulse 4s ease-in-out infinite;
+}
+
+@keyframes dividerPulse {
+
+    0%,
+    100% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+/* Main content area - dark theme */
+.MuiBox-root[component="main"] {
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 30%, #16213e 100%) !important;
+    min-height: 100vh !important;
+    position: relative !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.MuiBox-root[component="main"]::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 240px;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(circle at 70% 20%, rgba(139, 92, 246, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 20% 80%, rgba(236, 72, 153, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 80% 60%, rgba(59, 130, 246, 0.04) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: -1;
+    animation: mainBackgroundFloat 12s ease-in-out infinite;
+}
+
+@keyframes mainBackgroundFloat {
+
+    0%,
+    100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+
+    33% {
+        transform: translate(-10px, -15px) rotate(1deg);
+    }
+
+    66% {
+        transform: translate(10px, -10px) rotate(-1deg);
+    }
+}
+
+/* Entrance animations */
+.MuiDrawer-root .MuiListItemButton-root {
+    animation: slideInFromLeft 0.6s ease-out;
+}
+
+.MuiDrawer-root .MuiListItem-root:nth-child(1) .MuiListItemButton-root {
+    animation-delay: 0.1s;
+}
+
+.MuiDrawer-root .MuiListItem-root:nth-child(2) .MuiListItemButton-root {
+    animation-delay: 0.2s;
+}
+
+.MuiDrawer-root .MuiListItem-root:nth-child(3) .MuiListItemButton-root {
+    animation-delay: 0.3s;
+}
+
+.MuiDrawer-root .MuiListItem-root:nth-child(4) .MuiListItemButton-root {
+    animation-delay: 0.4s;
+}
+
+@keyframes slideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px) scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+/* Scrollbar styling for dark theme */
+.MuiDrawer-root .MuiDrawer-paper::-webkit-scrollbar {
+    width: 8px;
+}
+
+.MuiDrawer-root .MuiDrawer-paper::-webkit-scrollbar-track {
+    background: rgba(139, 92, 246, 0.1);
+    border-radius: 4px;
+}
+
+.MuiDrawer-root .MuiDrawer-paper::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #8b5cf6, #ec4899);
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+}
+
+.MuiDrawer-root .MuiDrawer-paper::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #a855f7, #f472b6);
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+}
+
+/* Focus states for accessibility */
+.MuiDrawer-root .MuiListItemButton-root:focus-visible {
+    outline: 2px solid #8b5cf6 !important;
+    outline-offset: 4px !important;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.4) !important;
+}
+
+/* Bottom section for upgrade button or additional content */
+.MuiDrawer-root .MuiList-root:last-child {
+    margin-top: auto;
+    padding-top: 0 !important;
+    border-top: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .MuiDrawer-root .MuiDrawer-paper {
+        width: 240px !important;
+    }
+
+    .MuiAppBar-root {
+        width: calc(100% - 240px) !important;
+        margin-left: 240px !important;
+    }
+
+    .MuiBox-root[component="main"]::before {
+        left: 240px !important;
+    }
+
+    .MuiDrawer-root .MuiListItemButton-root {
+        padding: 12px 16px !important;
+    }
+
+    .MuiDrawer-root .MuiListItemIcon-root {
+        min-width: 40px !important;
+    }
 }
