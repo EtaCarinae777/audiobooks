@@ -6,6 +6,7 @@ import Login from './components/Login'
 import About from './components/About'
 import Navbar from './components/Navbar'
 import { Routes, Route, useLocation} from 'react-router-dom'
+import ProtectedRoutes from './components/ProtectedRoutes'
 
 function App() {
 
@@ -27,8 +28,11 @@ function App() {
       <Navbar
         content = {
           <Routes>
-          <Route path="/home" element={<Home />} />
-          <Route path="/about" element={<About />} />
+          {/* <Route element ={<ProtectedRoutes />}> */}
+            <Route path="/home" element={<Home />} />
+            <Route path="/about" element={<About />} />
+          {/* </Route> */}
+
           </Routes>
         }
        />

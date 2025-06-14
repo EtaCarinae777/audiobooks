@@ -135,6 +135,14 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# #knox settings
+# from datetime import timedelta
+
+# REST_KNOX = {
+#     'TOKEN_TTL': timedelta(minutes = 1),  # Set to None for infinite token lifetime
+
+# }
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
