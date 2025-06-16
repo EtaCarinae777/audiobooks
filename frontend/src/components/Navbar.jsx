@@ -14,7 +14,9 @@ import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import HomeIcon from '@mui/icons-material/Home';
 import InfoIcon from '@mui/icons-material/Info';
-import { Link, useLocation } from 'react-router-dom';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import AxiosInstance from './AxiosInstance';
 
 const drawerWidth = 240;
 
@@ -22,6 +24,18 @@ export default function Navbar(props) {
     const {content} = props
     const location = useLocation();
     const path = location.pathname;
+    const navigate = useNavigate();
+
+    const logoutUser = () =>{
+      AxiosInstance.post(`logoutall/`,{
+      })
+      .then( () => {
+         localStorage.removeItem("Token")
+         navigate('/')
+      }
+ 
+      )
+   }
 
     return (
     <Box sx={{ display: 'flex' }}>
@@ -32,7 +46,7 @@ export default function Navbar(props) {
       >
         <Toolbar>
           <Typography variant="h6" noWrap component="div">
-            Permanent drawer
+            Audit
           </Typography>
         </Toolbar>
       </AppBar>
@@ -52,7 +66,7 @@ export default function Navbar(props) {
         <Divider />
         <List>
           
-            <ListItem key={1} disablePadding>
+            <ListItem key="home" disablePadding>
               <ListItemButton component={Link} to="/home" selected ={"/home" == path}>
                 <ListItemIcon>
                   <HomeIcon /> 
@@ -61,14 +75,41 @@ export default function Navbar(props) {
               </ListItemButton>
             </ListItem>
         
-            <ListItem key={1} disablePadding>
-              <ListItemButton component={Link} to="/about" selected ={"/about" == path}>   
+            <ListItem key="search" disablePadding>
+              <ListItemButton component={Link} to="/search" selected ={"/search" == path}>   
                 <ListItemIcon>
                   <InfoIcon /> 
                 </ListItemIcon>
-                <ListItemText primary={"About"} />
+                <ListItemText primary={"Search"} />
               </ListItemButton>
             </ListItem>
+
+            <ListItem key="library" disablePadding>
+              <ListItemButton component={Link} to="/yourlibrary" selected ={"/yourlibrary" == path}>   
+                <ListItemIcon>
+                  <InfoIcon /> 
+                </ListItemIcon>
+                <ListItemText primary={"YourLibrary"} />
+              </ListItemButton>
+            </ListItem>
+            
+            <ListItem key="account" disablePadding>
+              <ListItemButton component={Link} to="/account" selected ={"/account" == path}>   
+                <ListItemIcon>
+                  <InfoIcon /> 
+                </ListItemIcon>
+                <ListItemText primary={"Account"} />
+              </ListItemButton>
+            </ListItem>
+
+            <ListItem key={3} disablePadding>
+              <ListItemButton onClick={logoutUser}>
+                  <ListItemIcon>
+                        <LogoutIcon/> 
+                  </ListItemIcon>
+                  <ListItemText primary={"Logout"} />
+                </ListItemButton>
+              </ListItem>
         </List>
     
        

@@ -3,7 +3,9 @@ import './App.css'
 import Home from './components/Home'
 import Register from './components/Register'
 import Login from './components/Login'
-import About from './components/About'
+import Search from './components/Search'
+import YourLibrary from './components/YourLibrary'
+import Account from './components/Account'
 import Navbar from './components/Navbar'
 import { Routes, Route, useLocation} from 'react-router-dom'
 import ProtectedRoutes from './components/ProtectedRoutes'
@@ -28,10 +30,12 @@ function App() {
       <Navbar
         content = {
           <Routes>
-          {/* <Route element ={<ProtectedRoutes />}> */}
+          <Route element ={<ProtectedRoutes />}>
             <Route path="/home" element={<Home />} />
-            <Route path="/about" element={<About />} />
-          {/* </Route> */}
+            <Route path="/search" element={<Search />} />
+            <Route path="/yourlibrary" element={<YourLibrary />} />
+            <Route path="/account" element={<Account />} />
+          </Route>
 
           </Routes>
         }
