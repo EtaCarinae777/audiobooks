@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -142,6 +143,21 @@ STATIC_URL = 'static/'
 #     'TOKEN_TTL': timedelta(minutes = 1),  # Set to None for infinite token lifetime
 
 # }
+
+# Media files configuration
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Rozmiary plików multimedialnych
+FILE_UPLOAD_MAX_MEMORY_SIZE = 100 * 1024 *1024  # 100 MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 500 * 1024 * 1024  # 500 MB
+
+# formaty plikow
+
+ALLOWED_AUDIO_EXTENSIONS = ['.mp3', '.wav', '.ogg', '.m4a', '.aac']
+ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp']
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
