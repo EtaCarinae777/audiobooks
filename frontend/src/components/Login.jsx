@@ -39,7 +39,7 @@ const Login = () => {
 
             <Box className={"whiteBox"}>
                 <Box className={"itemBox"}>
-                    <Box className={"title"}>Login for Auth app</Box>
+                    <Box className={"login-title"}>Log in</Box>
                 </Box>
                 <Box className={"itemBox"}>
                     <MyTextField 
