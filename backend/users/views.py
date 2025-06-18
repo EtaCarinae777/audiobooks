@@ -86,6 +86,20 @@ class AuthorViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = AuthorSerializer
     permission_classes = [permissions.AllowAny]  # Publiczne
     
+    def get_queryset(self):
+        """Dodaje możliwość wyszukiwania autorów"""
+        queryset = Author.objects.all()
+        
+        # Wyszukiwanie
+        search = self.request.query_params.get('search')
+        if search:
+            queryset = queryset.filter(
+                Q(name__icontains=search) | 
+                Q(bio__icontains=search)
+            )
+        
+        return queryset
+    
     @action(detail=True, methods=['get'])
     def audiobooks(self, request, pk=None):
         """Zwraca audiobooki danego autora"""

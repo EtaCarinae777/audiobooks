@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AxiosInstance from './AxiosInstance';
 import {
     Box,
@@ -31,8 +32,10 @@ import {
     PlayCircle,
     AccessTime
 } from '@mui/icons-material';
+import LibraryButton from './forms/LibraryButton';  
 
 const Home = () => {
+    const navigate = useNavigate();
     const [audiobooks, setAudiobooks] = useState([]);
     const [authors, setAuthors] = useState([]);
     const [selectedAudiobook, setSelectedAudiobook] = useState(null);
@@ -96,16 +99,14 @@ const Home = () => {
         }
     };
 
-    // Dodaj do biblioteki
-    const addToLibrary = async (audiobookId) => {
-        try {
-            await AxiosInstance.post('library/add_audiobook/', {
-                audiobook_id: audiobookId
-            });
-            fetchData(); // Odśwież dane
-        } catch (error) {
-            console.error('Error adding to library:', error);
-        }
+  
+    // Przejdź do strony autora
+    const goToAuthorPage = (authorId) => {
+        navigate(`/author/${authorId}`);
+    };
+
+    const goToAudiobookPage = (audiobookId) => {
+        navigate(`/audiobook/${audiobookId}`); 
     };
 
     useEffect(() => {
@@ -156,7 +157,7 @@ const Home = () => {
                             <Card
                                 key={audiobook.id}
                                 className="audiobook-card"
-                                onClick={() => selectAudiobook(audiobook)}
+                                onClick={() => goToAudiobookPage(audiobook.id)} 
                                 style={{ animationDelay: `${index * 0.1}s` }}
                             >
                                 <div className="card-content">
@@ -232,6 +233,12 @@ const Home = () => {
                                         </div>
                                     )}
                                 </div>
+                                <LibraryButton 
+                                    audiobook={audiobook} 
+                                    onStatusChange={fetchData} 
+                                    size="small" 
+                                    fullWidth 
+                                />
                             </Card>
                         ))}
                     </div>
@@ -259,7 +266,18 @@ const Home = () => {
                             <Paper
                                 key={author.id}
                                 className="author-card"
-                                style={{ animationDelay: `${(index + 2) * 0.1}s` }}
+                                onClick={() => goToAuthorPage(author.id)}
+                                style={{ 
+                                    animationDelay: `${(index + 2) * 0.1}s`,
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s ease'
+                                }}
+                                sx={{
+                                    '&:hover': {
+                                        transform: 'translateY(-5px)',
+                                        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)'
+                                    }
+                                }}
                             >
                                 <div className="author-info">
                                     <Avatar className="author-avatar">
@@ -276,7 +294,7 @@ const Home = () => {
                                 </div>
                                 {author.bio && (
                                     <Typography className="author-bio">
-                                        {author.bio}
+                                        {author.bio.length > 100 ? `${author.bio.substring(0, 100)}...` : author.bio}
                                     </Typography>
                                 )}
                             </Paper>
@@ -365,18 +383,11 @@ const Home = () => {
 
                             {/* Przycisk biblioteka */}
                             <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-                                <Button
-                                    onClick={() => addToLibrary(selectedAudiobook.id)}
-                                    disabled={selectedAudiobook.is_in_library}
-                                    startIcon={
-                                        selectedAudiobook.is_in_library ? 
-                                        <LibraryAddCheck /> : 
-                                        <LibraryAdd />
-                                    }
-                                    className={`library-button ${selectedAudiobook.is_in_library ? 'in-library' : ''}`}
-                                >
-                                    {selectedAudiobook.is_in_library ? 'W bibliotece' : 'Dodaj do biblioteki'}
-                                </Button>
+                                <LibraryButton 
+                                    audiobook={selectedAudiobook}
+                                    onStatusChange={fetchData}
+                                    style={{ minWidth: '200px' }}
+                                />
                             </div>
                         </Paper>
                     )}

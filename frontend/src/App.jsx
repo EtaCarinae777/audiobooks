@@ -7,6 +7,8 @@ import Search from './components/Search'
 import YourLibrary from './components/YourLibrary'
 import Account from './components/Account'
 import Navbar from './components/Navbar'
+import AuthorPage from './components/AuthorPage'
+import AudiobookPage from "./components/AudiobookPage"
 import { Routes, Route, useLocation} from 'react-router-dom'
 import ProtectedRoutes from './components/ProtectedRoutes'
 
@@ -35,6 +37,8 @@ function App() {
             <Route path="/search" element={<Search />} />
             <Route path="/yourlibrary" element={<YourLibrary />} />
             <Route path="/account" element={<Account />} />
+            <Route path="/author/:id" element={<AuthorPage />} />
+            <Route path="/audiobook/:id" element={<AudiobookPage />} />  
           </Route>
 
           </Routes>
