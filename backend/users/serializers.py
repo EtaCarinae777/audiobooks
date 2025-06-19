@@ -50,6 +50,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class ChapterSerializer(serializers.ModelSerializer):
     duration_formatted = serializers.SerializerMethodField()
+    audio_file = serializers.SerializerMethodField()  # ← Dodaj to
     
     class Meta:
         model = Chapter
@@ -59,6 +60,15 @@ class ChapterSerializer(serializers.ModelSerializer):
         minutes = obj.duration_seconds // 60
         seconds = obj.duration_seconds % 60
         return f"{minutes}:{seconds:02d}"
+    
+    def get_audio_file(self, obj):
+        """Zwraca pełny URL do pliku audio"""
+        if obj.audio_file:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.audio_file.url)
+            return obj.audio_file.url
+        return None
 
 class AudiobookListSerializer(serializers.ModelSerializer):
     """Uproszczony serializer dla listy audiobooków"""

@@ -183,7 +183,7 @@ class AudiobookViewSet(viewsets.ReadOnlyModelViewSet):
         """Zwraca rozdziały audiobooka"""
         audiobook = self.get_object()
         chapters = audiobook.chapters.all()
-        serializer = ChapterSerializer(chapters, many=True)
+        serializer = ChapterSerializer(chapters, many=True, context={'request':request})
         return Response(serializer.data)
 
 class UserLibraryViewSet(viewsets.ModelViewSet):
