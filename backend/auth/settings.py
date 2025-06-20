@@ -56,14 +56,13 @@ MIDDLEWARE = [
 
 # CORS settings
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',  # Local Next.js
-    'http://26.192.104.133:3000',  # Network Next.js
+    'http://localhost:5173', #adress of your frontend
 ]
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
 AUTHENTICATION_BACKENDS = [
-     'users.auth_backend.EmailAuthBackend',
+    'users.auth_backend.EmailBackend',
 ]
 
 ROOT_URLCONF = 'auth.urls'
