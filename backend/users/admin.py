@@ -42,10 +42,11 @@ class ChapterInline(admin.TabularInline):
 @admin.register(Audiobook)
 class AudiobookAdmin(admin.ModelAdmin):
     list_display = ['title', 'author', 'category', 'cover_preview', 'chapters_count', 
-                   'total_file_size', 'is_featured', 'created_at']
-    list_filter = ['category', 'author', 'is_featured', 'publication_date']
+                   'total_file_size', 'is_premium', 'price', 'is_featured', 'created_at']
+    list_filter = ['category', 'author', 'is_premium', 'is_featured', 'publication_date']
     search_fields = ['title', 'author__name', 'narrator']
     readonly_fields = ['cover_preview', 'total_file_size', 'created_at']
+    list_editable = ['is_premium', 'price', 'is_featured']  # Dodane edytowalne pola
     
     fieldsets = (
         ('Podstawowe informacje', {
@@ -58,7 +59,7 @@ class AudiobookAdmin(admin.ModelAdmin):
             'fields': ('narrator', 'duration_minutes', 'publication_date')
         }),
         ('Ustawienia', {
-            'fields': ('is_featured',)
+            'fields': ('is_featured', 'is_premium', 'price')  # Dodane pola premium
         }),
         ('Statystyki', {
             'fields': ('total_file_size', 'created_at'),
@@ -104,7 +105,7 @@ class ChapterAdmin(admin.ModelAdmin):
         if obj.audio_file:
             size = get_file_size_display(obj.audio_file.size)
             return format_html(
-                '<a href="{}" target="_blank">🎵 {}</a><br/><small>Rozmiar: {}</small>',
+                '<a href="{}" target="_blank">Audio: {}</a><br/><small>Rozmiar: {}</small>',
                 obj.audio_file.url,
                 obj.audio_file.name.split('/')[-1],
                 size
@@ -122,7 +123,7 @@ class ChapterAdmin(admin.ModelAdmin):
 class UserLibraryAdmin(admin.ModelAdmin):
     list_display = ['user', 'audiobook', 'added_at', 'is_favorite']
     list_filter = ['is_favorite', 'added_at', 'audiobook__category']
-    search_fields = ['user__username', 'audiobook__title']
+    search_fields = ['user__email', 'audiobook__title']  # Zmienione z username na email
     date_hierarchy = 'added_at'
 
 @admin.register(ListeningProgress)
@@ -130,7 +131,7 @@ class ListeningProgressAdmin(admin.ModelAdmin):
     list_display = ['user', 'audiobook', 'current_chapter', 'progress_percentage', 
                    'is_completed', 'last_listened']
     list_filter = ['is_completed', 'last_listened', 'audiobook__category']
-    search_fields = ['user__username', 'audiobook__title']
+    search_fields = ['user__email', 'audiobook__title']  # Zmienione z username na email
     readonly_fields = ['progress_percentage']
     date_hierarchy = 'last_listened'
     
@@ -142,7 +143,7 @@ class ListeningProgressAdmin(admin.ModelAdmin):
 class RatingAdmin(admin.ModelAdmin):
     list_display = ['user', 'audiobook', 'rating', 'created_at', 'review_preview']
     list_filter = ['rating', 'created_at', 'audiobook__category']
-    search_fields = ['user__username', 'audiobook__title', 'review']
+    search_fields = ['user__email', 'audiobook__title', 'review']  # Zmienione z username na email
     date_hierarchy = 'created_at'
     
     def review_preview(self, obj):
@@ -150,6 +151,49 @@ class RatingAdmin(admin.ModelAdmin):
             return obj.review[:50] + "..." if len(obj.review) > 50 else obj.review
         return "Brak recenzji"
     review_preview.short_description = 'Recenzja (podgląd)'
+
+# NOWY - Purchase Admin
+@admin.register(Purchase)
+class PurchaseAdmin(admin.ModelAdmin):
+    list_display = ['user_email', 'audiobook_title', 'price_paid', 'payment_status', 'purchased_at', 'payment_method']
+    list_filter = ['payment_status', 'purchased_at', 'audiobook__category', 'audiobook__is_premium']
+    search_fields = ['user__email', 'audiobook__title', 'payment_id']
+    readonly_fields = ['purchased_at', 'payment_id']
+    ordering = ['-purchased_at']
+    date_hierarchy = 'purchased_at'
+    
+    fieldsets = (
+        ('Informacje o zakupie', {
+            'fields': ('user', 'audiobook', 'price_paid')
+        }),
+        ('Status płatności', {
+            'fields': ('payment_status', 'payment_id')
+        }),
+        ('Daty', {
+            'fields': ('purchased_at',),
+            'classes': ('collapse',)
+        })
+    )
+    
+    def user_email(self, obj):
+        return obj.user.email
+    user_email.short_description = 'Email użytkownika'
+    user_email.admin_order_field = 'user__email'
+    
+    def audiobook_title(self, obj):
+        premium_badge = " [PREMIUM]" if obj.audiobook.is_premium else " [FREE]"
+        return f"{obj.audiobook.title}{premium_badge}"
+    audiobook_title.short_description = 'Audiobook'
+    audiobook_title.admin_order_field = 'audiobook__title'
+    
+    def payment_method(self, obj):
+        if obj.payment_id:
+            return "Stripe"
+        return "Ręczne"
+    payment_method.short_description = 'Metoda płatności'
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user', 'audiobook', 'audiobook__author')
 
 # Dodatkowe konfiguracje
 admin.site.site_header = "Panel Administracyjny - Audiobooki"

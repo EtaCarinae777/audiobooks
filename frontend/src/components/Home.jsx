@@ -30,9 +30,13 @@ import {
     SkipNext,
     SkipPrevious,
     PlayCircle,
-    AccessTime
+    AccessTime,
+    Lock,
+    CheckCircle,
+    ShoppingCart
 } from '@mui/icons-material';
 import LibraryButton from './forms/LibraryButton';  
+import RealStripePayment from './RealStripePayment';
 
 const Home = () => {
     const navigate = useNavigate();
@@ -44,6 +48,8 @@ const Home = () => {
     const [loading, setLoading] = useState(true);
     const [chaptersLoading, setChaptersLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [stripeDialog, setStripeDialog] = useState(false);
+const [selectedAudiobookForPayment, setSelectedAudiobookForPayment] = useState(null);
 
     // Pobierz dane
     const fetchData = async () => {
@@ -76,15 +82,28 @@ const Home = () => {
             setSelectedAudiobook(audiobook);
             setCurrentChapterIndex(0);
             
-            const response = await AxiosInstance.get(`audiobooks/${audiobook.id}/chapters/`);
-            setChapters(response.data);
+            try {
+                const response = await AxiosInstance.get(`audiobooks/${audiobook.id}/chapters/`);
+                setChapters(response.data);
+            } catch (chaptersError) {
+                console.log('Chapters error:', chaptersError); // DEBUG
+                if (chaptersError.response?.status === 403) {
+                    // Brak dostępu do rozdziałów - prawdopodobnie premium
+                    console.log('403 - brak dostępu do rozdziałów'); // DEBUG
+                    setChapters([]);
+                } else {
+                    console.error('Inny błąd przy pobieraniu rozdziałów:', chaptersError);
+                    setChapters([]);
+                }
+            }
         } catch (error) {
             console.error('Error fetching chapters:', error);
+            setChapters([]);
         } finally {
             setChaptersLoading(false);
         }
     };
-
+    
     // Następny rozdział
     const nextChapter = () => {
         if (currentChapterIndex < chapters.length - 1) {
@@ -99,7 +118,26 @@ const Home = () => {
         }
     };
 
-  
+    // Funkcja zakupu audiobooka
+    const handleQuickPurchase = (audiobook, event) => {
+        event.stopPropagation();
+        setSelectedAudiobookForPayment(audiobook);
+        setStripeDialog(true);
+    };
+
+    const handlePaymentSuccess = async (message) => {
+        alert(message);
+        await fetchData(); // Odśwież dane
+        
+        // Jeśli to jest wybrany audiobook, odśwież jego rozdziały
+        if (selectedAudiobook && selectedAudiobook.id === selectedAudiobookForPayment.id) {
+            await selectAudiobook(selectedAudiobookForPayment);
+        }
+        
+        setStripeDialog(false);
+        setSelectedAudiobookForPayment(null);
+    };
+
     // Przejdź do strony autora
     const goToAuthorPage = (authorId) => {
         navigate(`/author/${authorId}`);
@@ -107,6 +145,11 @@ const Home = () => {
 
     const goToAudiobookPage = (audiobookId) => {
         navigate(`/audiobook/${audiobookId}`); 
+    };
+
+    // Sprawdź czy użytkownik ma dostęp do audiobooka
+    const hasAccess = (audiobook) => {
+        return !audiobook.is_premium || audiobook.is_purchased;
     };
 
     useEffect(() => {
@@ -170,6 +213,25 @@ const Home = () => {
                                             style={{ borderRadius: '12px' }}
                                         />
                                         
+                                        {/* Premium badge */}
+                                        {audiobook.is_premium && (
+                                            <Chip
+                                                icon={audiobook.is_purchased ? <CheckCircle /> : <Lock />}
+                                                label={audiobook.is_purchased ? 'ZAKUPIONE' : `${audiobook.price} PLN`}
+                                                sx={{
+                                                    position: 'absolute',
+                                                    top: 8,
+                                                    right: 8,
+                                                    background: audiobook.is_purchased 
+                                                        ? 'linear-gradient(135deg, #10b981, #059669)'
+                                                        : 'linear-gradient(135deg, #f59e0b, #d97706)',
+                                                    color: 'white',
+                                                    fontWeight: 'bold',
+                                                    fontSize: '0.75rem'
+                                                }}
+                                            />
+                                        )}
+                                        
                                         {/* Play overlay */}
                                         <div style={{
                                             position: 'absolute',
@@ -189,16 +251,23 @@ const Home = () => {
                                         >
                                             <IconButton
                                                 sx={{
-                                                    background: 'linear-gradient(135deg, #667eea, #ec4899)',
+                                                    background: hasAccess(audiobook) 
+                                                        ? 'linear-gradient(135deg, #667eea, #ec4899)'
+                                                        : 'rgba(156, 163, 175, 0.8)',
                                                     color: 'white',
                                                     width: 60,
                                                     height: 60,
                                                     '&:hover': {
-                                                        transform: 'scale(1.1)'
+                                                        transform: hasAccess(audiobook) ? 'scale(1.1)' : 'none'
                                                     }
                                                 }}
+                                                disabled={!hasAccess(audiobook)}
                                             >
-                                                <PlayArrow sx={{ fontSize: 30 }} />
+                                                {hasAccess(audiobook) ? (
+                                                    <PlayArrow sx={{ fontSize: 30 }} />
+                                                ) : (
+                                                    <Lock sx={{ fontSize: 30 }} />
+                                                )}
                                             </IconButton>
                                         </div>
                                     </div>
@@ -233,12 +302,32 @@ const Home = () => {
                                         </div>
                                     )}
                                 </div>
-                                <LibraryButton 
-                                    audiobook={audiobook} 
-                                    onStatusChange={fetchData} 
-                                    size="small" 
-                                    fullWidth 
-                                />
+
+                                {/* Przycisk akcji */}
+                                {audiobook.is_premium && !audiobook.is_purchased ? (
+                                    <Button
+                                        onClick={(e) => handleQuickPurchase(audiobook, e)}
+                                        startIcon={<ShoppingCart />}
+                                        sx={{
+                                            background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                                            color: 'white',
+                                            margin: '0.5rem',
+                                            '&:hover': {
+                                                background: 'linear-gradient(135deg, #d97706, #b45309)'
+                                            }
+                                        }}
+                                        fullWidth
+                                    >
+                                        Kup za {audiobook.price} PLN
+                                    </Button>
+                                ) : (
+                                    <LibraryButton 
+                                        audiobook={audiobook} 
+                                        onStatusChange={fetchData} 
+                                        size="small" 
+                                        fullWidth 
+                                    />
+                                )}
                             </Card>
                         ))}
                     </div>
@@ -308,15 +397,67 @@ const Home = () => {
             {/* Sekcja 3: Carousel rozdziałów */}
             {selectedAudiobook && (
                 <section>
-                    <Typography className="home-section-title">
-                        <PlayCircle sx={{ mr: 2, fontSize: '2.5rem', color: '#3b82f6' }} />
+                <Box className="home-section-title" sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                    <PlayCircle sx={{ mr: 2, fontSize: '2.5rem', color: '#3b82f6' }} />
+                    <Typography variant="h4" component="span" sx={{ color: 'white', fontWeight: 'bold' }}>
                         Rozdziały: {selectedAudiobook.title}
                     </Typography>
-
+                    {selectedAudiobook.is_premium && (
+                        <Chip
+                            icon={selectedAudiobook.is_purchased ? <CheckCircle /> : <Lock />}
+                            label={selectedAudiobook.is_purchased ? 'ZAKUPIONE' : 'PREMIUM'}
+                            sx={{
+                                ml: 2,
+                                background: selectedAudiobook.is_purchased 
+                                    ? 'linear-gradient(135deg, #10b981, #059669)'
+                                    : 'linear-gradient(135deg, #f59e0b, #d97706)',
+                                color: 'white',
+                                fontWeight: 'bold'
+                            }}
+                        />
+                    )}
+                </Box>
                     {chaptersLoading ? (
                         <div className="loading-container">
                             <CircularProgress size={40} sx={{ color: '#667eea' }} />
                         </div>
+                    ) : !hasAccess(selectedAudiobook) ? (
+                        <Paper className="chapter-carousel">
+                            <div style={{ 
+                                textAlign: 'center', 
+                                padding: '4rem 2rem',
+                                background: 'rgba(245, 158, 11, 0.1)',
+                                borderRadius: '15px',
+                                border: '2px solid rgba(245, 158, 11, 0.3)'
+                            }}>
+                                <Lock sx={{ fontSize: 64, color: 'rgba(245, 158, 11, 0.8)', mb: 2 }} />
+                                <Typography variant="h5" sx={{ color: 'white', mb: 2, fontWeight: 'bold' }}>
+                                    Audiobook Premium
+                                </Typography>
+                                <Typography sx={{ color: 'rgba(255, 255, 255, 0.8)', mb: 3, fontSize: '1.1rem' }}>
+                                    Ten audiobook jest dostępny w wersji premium za {selectedAudiobook.price} PLN
+                                </Typography>
+                                <Button
+                                    onClick={(e) => handleQuickPurchase(selectedAudiobook, e)}
+                                    startIcon={<ShoppingCart />}
+                                    variant="contained"
+                                    sx={{
+                                        background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                                        color: 'white',
+                                        fontSize: '1.1rem',
+                                        fontWeight: 'bold',
+                                        px: 4,
+                                        py: 1.5,
+                                        '&:hover': {
+                                            background: 'linear-gradient(135deg, #d97706, #b45309)',
+                                            transform: 'scale(1.05)'
+                                        }
+                                    }}
+                                >
+                                    Kup za {selectedAudiobook.price} PLN
+                                </Button>
+                            </div>
+                        </Paper>
                     ) : chapters.length === 0 ? (
                         <div style={{ textAlign: 'center', padding: '4rem 0' }}>
                             <Typography variant="h6" sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>
@@ -392,6 +533,17 @@ const Home = () => {
                         </Paper>
                     )}
                 </section>
+            )}
+            {selectedAudiobookForPayment && (
+                <RealStripePayment
+                    open={stripeDialog}
+                    onClose={() => {
+                        setStripeDialog(false);
+                        setSelectedAudiobookForPayment(null);
+                    }}
+                    audiobook={selectedAudiobookForPayment}
+                    onSuccess={handlePaymentSuccess}
+                />
             )}
         </div>
     );

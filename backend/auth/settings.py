@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+import stripe
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -163,3 +164,7 @@ ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp']
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+STRIPE_PUBLISHABLE_KEY = 'pk_test_51Rc0TcB3FY7gDqX2ZtUPWIrarMZYSZUGYKEN0rrbNKGGlLGdzvsSn9ohm104P6dDlhJSIP9kXnbpXFHAbrSOvygz00XSGxyKcn'
+STRIPE_SECRET_KEY = 'sk_test_51Rc0TcB3FY7gDqX2Adsj0fUiUdlbNyI0mjSLQEP2PK739KW71qJptydDCcqHo0jD2K4jnMkjK7OdmqbCDCMWSIbJ00lkZe8M3t'

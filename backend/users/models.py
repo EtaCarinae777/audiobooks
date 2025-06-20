@@ -75,19 +75,36 @@ class Audiobook(models.Model):
         validators=[validate_image_file],
         help_text="Okładka audiobooka (JPG, PNG, max 10MB)"
     )
-    duration_minutes = models.PositiveIntegerField()  # całkowity czas trwania
+    duration_minutes = models.PositiveIntegerField()
     publication_date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
     is_featured = models.BooleanField(default=False)
     
+    # DODAJ TE POLA:
+    is_premium = models.BooleanField(
+        default=False, 
+        verbose_name="Premium audiobook",
+        help_text="Czy audiobook wymaga zakupu (płatny)"
+    )
+    price = models.DecimalField(
+        max_digits=6, 
+        decimal_places=2, 
+        null=True, 
+        blank=True,
+        verbose_name="Cena",
+        help_text="Cena w PLN (tylko dla premium)"
+    )
+    
     def __str__(self):
-        return f"{self.title} - {self.author.name}"
+        premium_marker = f" [PREMIUM - {self.price} PLN]" if self.is_premium else " [FREE]"
+        return f"{self.title} - {self.author.name}{premium_marker}"
     
     @property
     def duration_formatted(self):
         hours = self.duration_minutes // 60
         minutes = self.duration_minutes % 60
         return f"{hours}h {minutes}m"
+    
 
 class Chapter(models.Model):
     audiobook = models.ForeignKey(Audiobook, on_delete=models.CASCADE, related_name='chapters')
@@ -163,3 +180,32 @@ class Rating(models.Model):
     
     def __str__(self):
         return f"{self.user.username} - {self.audiobook.title} - {self.rating}/5"
+    
+
+class Purchase(models.Model):
+    """Model przechowujący informacje o zakupionych audiobookach"""
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='purchases')
+    audiobook = models.ForeignKey(Audiobook, on_delete=models.CASCADE, related_name='purchases')
+    price_paid = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="Zapłacona cena")
+    purchased_at = models.DateTimeField(auto_now_add=True)
+    
+    # Pola dla integracji z płatnościami (później)
+    payment_id = models.CharField(max_length=100, null=True, blank=True, help_text="ID płatności ze Stripe")
+    payment_status = models.CharField(
+        max_length=20,
+        choices=[
+            ('pending', 'Oczekująca'),
+            ('completed', 'Zakończona'),
+            ('failed', 'Nieudana'),
+            ('refunded', 'Zwrócona'),
+        ],
+        default='completed'  # Na razie domyślnie completed
+    )
+    
+    class Meta:
+        unique_together = ['user', 'audiobook']  # Jeden użytkownik nie może kupić tej samej książki dwa razy
+        verbose_name = "Purchase"
+        verbose_name_plural = "Purchases"
+    
+    def __str__(self):
+        return f"{self.user.email} bought {self.audiobook.title} for {self.price_paid} PLN"

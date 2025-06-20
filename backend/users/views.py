@@ -10,8 +10,11 @@ from rest_framework.permissions import AllowAny
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from django.db.models import Q, Avg
+import stripe
+from django.conf import settings
 
 User = get_user_model()
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 class LoginViewset(viewsets.ViewSet):
     permission_classes = [permissions.AllowAny]
@@ -123,9 +126,9 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 class AudiobookViewSet(viewsets.ReadOnlyModelViewSet):
-    """ViewSet dla audiobooków - tylko odczyt"""
+    """ViewSet dla audiobooków z logiką premium/darmowych"""
     queryset = Audiobook.objects.select_related('author', 'category').prefetch_related('chapters')
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]  # Publiczne czytanie, auth dla szczegółów
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     
     def get_serializer_class(self):
         if self.action == 'retrieve':
@@ -134,6 +137,9 @@ class AudiobookViewSet(viewsets.ReadOnlyModelViewSet):
     
     def get_queryset(self):
         queryset = self.queryset
+        
+        # Filtrowanie bez ukrywania premium - po prostu pokazujemy wszystko
+        # Premium będzie oznaczone w serializer
         
         # Filtrowanie po kategorii
         category = self.request.query_params.get('category')
@@ -154,36 +160,135 @@ class AudiobookViewSet(viewsets.ReadOnlyModelViewSet):
                 Q(description__icontains=search)
             )
         
+        # Filtr: tylko darmowe
+        free_only = self.request.query_params.get('free_only')
+        if free_only == 'true':
+            queryset = queryset.filter(is_premium=False)
+        
+        # Filtr: tylko premium
+        premium_only = self.request.query_params.get('premium_only')
+        if premium_only == 'true':
+            queryset = queryset.filter(is_premium=True)
+        
         # Sortowanie
         ordering = self.request.query_params.get('ordering', '-created_at')
-        if ordering in ['title', '-title', 'publication_date', '-publication_date', 'created_at', '-created_at']:
+        if ordering in ['title', '-title', 'publication_date', '-publication_date', 'created_at', '-created_at', 'price', '-price']:
             queryset = queryset.order_by(ordering)
         
         return queryset
     
-    @action(detail=False, methods=['get'])
-    def featured(self, request):
-        """Zwraca polecane audiobooki"""
-        featured = self.queryset.filter(is_featured=True)
-        serializer = self.get_serializer(featured, many=True)
-        return Response(serializer.data)
-    
-    @action(detail=False, methods=['get'])
-    def popular(self, request):
-        """Zwraca popularne audiobooki (na podstawie ocen)"""
-        popular = self.queryset.annotate(
-            avg_rating=Avg('ratings__rating')
-        ).filter(avg_rating__isnull=False).order_by('-avg_rating')[:10]
+    def retrieve(self, request, *args, **kwargs):
+        """Pobierz szczegóły audiobooka - sprawdź dostęp"""
+        audiobook = self.get_object()
         
-        serializer = self.get_serializer(popular, many=True)
+        # Jeśli premium, sprawdź czy użytkownik kupił
+        if audiobook.is_premium and request.user.is_authenticated:
+            has_purchased = Purchase.objects.filter(
+                user=request.user, 
+                audiobook=audiobook,
+                payment_status='completed'
+            ).exists()
+            
+            if not has_purchased:
+                # Zwróć ograniczone info - bez rozdziałów
+                serializer = AudiobookListSerializer(audiobook, context={'request': request})
+                data = serializer.data
+                data['access_denied'] = True
+                data['message'] = f"Ten audiobook kosztuje {audiobook.price} PLN. Kup go, aby uzyskać pełny dostęp."
+                return Response(data)
+        
+        # Pełny dostęp
+        serializer = self.get_serializer(audiobook)
         return Response(serializer.data)
     
     @action(detail=True, methods=['get'])
     def chapters(self, request, pk=None):
-        """Zwraca rozdziały audiobooka"""
+        """Zwraca rozdziały - tylko dla zakupionych premium lub darmowych"""
         audiobook = self.get_object()
+        
+        # Sprawdź dostęp
+        if audiobook.is_premium:
+            if not request.user.is_authenticated:
+                return Response(
+                    {"error": "Zaloguj się, aby kupić ten audiobook"}, 
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+            
+            has_purchased = Purchase.objects.filter(
+                user=request.user, 
+                audiobook=audiobook,
+                payment_status='completed'
+            ).exists()
+            
+            if not has_purchased:
+                return Response(
+                    {"error": f"Kup ten audiobook za {audiobook.price} PLN, aby uzyskać dostęp do rozdziałów"}, 
+                    status=status.HTTP_403_FORBIDDEN
+                )
+        
         chapters = audiobook.chapters.all()
-        serializer = ChapterSerializer(chapters, many=True, context={'request':request})
+        serializer = ChapterSerializer(chapters, many=True, context={'request': request})
+        return Response(serializer.data)
+    
+    @action(detail=True, methods=['post'])
+    def purchase(self, request, pk=None):
+        """Kup audiobook (na razie bez prawdziwej płatności)"""
+        if not request.user.is_authenticated:
+            return Response(
+                {"error": "Musisz być zalogowany, aby kupować audiobooki"}, 
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        
+        audiobook = self.get_object()
+        
+        if not audiobook.is_premium:
+            return Response(
+                {"error": "Ten audiobook jest darmowy"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Sprawdź czy już kupiony
+        if Purchase.objects.filter(user=request.user, audiobook=audiobook).exists():
+            return Response(
+                {"message": "Już kupiłeś ten audiobook"}, 
+                status=status.HTTP_200_OK
+            )
+        
+        # Utwórz zakup (bez prawdziwej płatności na razie)
+        purchase = Purchase.objects.create(
+            user=request.user,
+            audiobook=audiobook,
+            price_paid=audiobook.price,
+            payment_status='completed'  # Na razie od razu completed
+        )
+        
+        # Dodaj do biblioteki
+        UserLibrary.objects.get_or_create(
+            user=request.user,
+            audiobook=audiobook
+        )
+        
+        return Response({
+            "message": f"Pomyślnie kupiłeś {audiobook.title} za {audiobook.price} PLN",
+            "purchase_id": purchase.id
+        }, status=status.HTTP_201_CREATED)
+    
+    @action(detail=False, methods=['get'])
+    def my_purchases(self, request):
+        """Zwraca zakupione audiobooki użytkownika"""
+        if not request.user.is_authenticated:
+            return Response(
+                {"error": "Musisz być zalogowany"}, 
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        
+        purchases = Purchase.objects.filter(
+            user=request.user, 
+            payment_status='completed'
+        ).select_related('audiobook', 'audiobook__author')
+        
+        audiobooks = [purchase.audiobook for purchase in purchases]
+        serializer = AudiobookListSerializer(audiobooks, many=True, context={'request': request})
         return Response(serializer.data)
 
 class UserLibraryViewSet(viewsets.ModelViewSet):
@@ -345,3 +450,117 @@ class RatingViewSet(viewsets.ModelViewSet):
         ratings = Rating.objects.filter(audiobook__id=audiobook_id).select_related('user')
         serializer = self.get_serializer(ratings, many=True)
         return Response(serializer.data)
+    
+class PurchaseViewSet(viewsets.ReadOnlyModelViewSet):
+    """ViewSet dla zakupów - tylko odczyt"""
+    serializer_class = PurchaseSerializer
+    permission_classes = [permissions.IsAuthenticated]  # Tylko zalogowani
+    
+    def get_queryset(self):
+        """Zwraca tylko zakupy użytkownika"""
+        return Purchase.objects.filter(user=self.request.user).select_related(
+            'audiobook', 'audiobook__author'
+        ).order_by('-purchased_at')
+    
+    @action(detail=False, methods=['get'])
+    def completed(self, request):
+        """Zwraca tylko ukończone zakupy"""
+        completed_purchases = self.get_queryset().filter(payment_status='completed')
+        serializer = self.get_serializer(completed_purchases, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def pending(self, request):
+        """Zwraca oczekujące zakupy"""
+        pending_purchases = self.get_queryset().filter(payment_status='pending')
+        serializer = self.get_serializer(pending_purchases, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def total_spent(self, request):
+        """Zwraca łączną kwotę wydaną przez użytkownika"""
+        from django.db.models import Sum
+        total = self.get_queryset().filter(payment_status='completed').aggregate(
+            total=Sum('price_paid')
+        )['total'] or 0
+        
+        return Response({
+            'total_spent': float(total),
+            'currency': 'PLN'
+        })
+    
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def create_payment_intent(request):
+    """Utwórz PaymentIntent przez Stripe"""
+    try:
+        audiobook_id = request.data.get('audiobook_id')
+        audiobook = get_object_or_404(Audiobook, id=audiobook_id)
+        
+        # Sprawdź czy już kupiony
+        if Purchase.objects.filter(user=request.user, audiobook=audiobook).exists():
+            return Response({'error': 'Już kupiłeś ten audiobook'}, status=400)
+        
+        # Utwórz PaymentIntent przez prawdziwy Stripe
+        payment_intent = stripe.PaymentIntent.create(
+            amount=int(float(audiobook.price) * 100),  # w groszach
+            currency='pln',
+            metadata={
+                'audiobook_id': str(audiobook.id),
+                'user_id': str(request.user.id)
+            }
+        )
+        
+        return Response({
+            'client_secret': payment_intent.client_secret,
+            'audiobook': {
+                'id': audiobook.id, 
+                'title': audiobook.title,
+                'price': str(audiobook.price)
+            }
+        })
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def confirm_payment(request):
+    """Potwierdź płatność po sukcesie"""
+    try:
+        payment_intent_id = request.data.get('payment_intent_id')
+        
+        # Sprawdź status w Stripe
+        payment_intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+        
+        if payment_intent.status == 'succeeded':
+            audiobook_id = payment_intent.metadata['audiobook_id']
+            audiobook = get_object_or_404(Audiobook, id=audiobook_id)
+            
+            # Utwórz zakup
+            Purchase.objects.create(
+                user=request.user,
+                audiobook=audiobook,
+                price_paid=audiobook.price,
+                payment_id=payment_intent_id,
+                payment_status='completed'
+            )
+            
+            # Dodaj do biblioteki
+            UserLibrary.objects.get_or_create(
+                user=request.user,
+                audiobook=audiobook
+            )
+            
+            return Response({'message': f'Zakupiono {audiobook.title}!'})
+        
+        return Response({'error': 'Płatność nieudana'}, status=400)
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
+
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def get_stripe_config(request):
+    """Zwróć klucz publiczny Stripe"""
+    return Response({
+        'publishable_key': settings.STRIPE_PUBLISHABLE_KEY
+    })

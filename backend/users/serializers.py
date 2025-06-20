@@ -27,6 +27,15 @@ class RegisterSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(**validated_data)
         return user
         
+class UserAccountSerializer(serializers.ModelSerializer):
+    plan_display_name = serializers.CharField(source='get_plan_display_name', read_only=True)
+    
+    class Meta:
+        model = User
+        fields = [
+            'id', 'email', 'plan', 'plan_display_name', 'date_joined'
+        ]
+        read_only_fields = ['id', 'email', 'date_joined', 'plan_display_name']
 
 class AuthorSerializer(serializers.ModelSerializer):
     audiobooks_count = serializers.SerializerMethodField()
@@ -76,13 +85,14 @@ class AudiobookListSerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(source='category.name', read_only=True)
     average_rating = serializers.SerializerMethodField()
     is_in_library = serializers.SerializerMethodField()
+    is_purchased = serializers.SerializerMethodField()  # Czy użytkownik kupił
     
     class Meta:
         model = Audiobook
         fields = [
             'id', 'title', 'author_name', 'category_name', 'narrator',
             'cover_image', 'duration_formatted', 'average_rating', 
-            'is_featured', 'is_in_library'
+            'is_featured', 'is_premium', 'price', 'is_in_library', 'is_purchased'
         ]
     
     def get_average_rating(self, obj):
@@ -96,6 +106,33 @@ class AudiobookListSerializer(serializers.ModelSerializer):
         if request and request.user.is_authenticated:
             return UserLibrary.objects.filter(user=request.user, audiobook=obj).exists()
         return False
+    
+    def get_is_purchased(self, obj):
+        """Sprawdza czy użytkownik kupił ten audiobook"""
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return Purchase.objects.filter(
+                user=request.user, 
+                audiobook=obj,
+                payment_status='completed'
+            ).exists()
+        return False
+
+
+class PurchaseSerializer(serializers.ModelSerializer):
+    """Serializer dla zakupów"""
+    audiobook_title = serializers.CharField(source='audiobook.title', read_only=True)
+    audiobook_author = serializers.CharField(source='audiobook.author.name', read_only=True)
+    audiobook_cover = serializers.CharField(source='audiobook.cover_image', read_only=True)
+    
+    class Meta:
+        model = Purchase
+        fields = [
+            'id', 'audiobook', 'audiobook_title', 'audiobook_author', 'audiobook_cover',
+            'price_paid', 'purchased_at', 'payment_status', 'payment_id'
+        ]
+        read_only_fields = ['user']
+
 
 class AudiobookDetailSerializer(serializers.ModelSerializer):
     """Szczegółowy serializer dla pojedynczego audiobooka"""
@@ -129,6 +166,16 @@ class AudiobookDetailSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if request and request.user.is_authenticated:
             return UserLibrary.objects.filter(user=request.user, audiobook=obj).exists()
+        return False
+    
+    def get_is_purchased(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return Purchase.objects.filter(
+                user=request.user, 
+                audiobook=obj,
+                payment_status='completed'
+            ).exists()
         return False
     
     def get_user_progress(self, obj):
