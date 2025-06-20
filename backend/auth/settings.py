@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+import stripe
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -62,7 +64,8 @@ CORS_ALLOWED_ORIGINS = [
 AUTH_USER_MODEL = 'users.CustomUser'
 
 AUTHENTICATION_BACKENDS = [
-    'users.auth_backend.EmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
+    'users.auth_backend.EmailAuthBackend',
 ]
 
 ROOT_URLCONF = 'auth.urls'
@@ -134,7 +137,34 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# #knox settings
+# from datetime import timedelta
+
+# REST_KNOX = {
+#     'TOKEN_TTL': timedelta(minutes = 1),  # Set to None for infinite token lifetime
+
+# }
+
+# Media files configuration
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Rozmiary plików multimedialnych
+FILE_UPLOAD_MAX_MEMORY_SIZE = 100 * 1024 *1024  # 100 MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 500 * 1024 * 1024  # 500 MB
+
+# formaty plikow
+
+ALLOWED_AUDIO_EXTENSIONS = ['.mp3', '.wav', '.ogg', '.m4a', '.aac']
+ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp']
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+STRIPE_PUBLISHABLE_KEY = 'pk_test_51Rc0TcB3FY7gDqX2ZtUPWIrarMZYSZUGYKEN0rrbNKGGlLGdzvsSn9ohm104P6dDlhJSIP9kXnbpXFHAbrSOvygz00XSGxyKcn'
+STRIPE_SECRET_KEY = 'sk_test_51Rc0TcB3FY7gDqX2Adsj0fUiUdlbNyI0mjSLQEP2PK739KW71qJptydDCcqHo0jD2K4jnMkjK7OdmqbCDCMWSIbJ00lkZe8M3t'

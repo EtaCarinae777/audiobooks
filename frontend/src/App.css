@@ -1,49 +1,1306 @@
-.myBackground{
+/* Modern Login Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* === BACKGROUND & CONTAINER STYLES === */
+.myBackground {
     width: 100vw;
     height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #000000;
-    background: radial-gradient(circle, rgba(0, 0, 0, 1) 0%, rgba(173, 2, 36, 1) 100%);
-}
-
-.whiteBox{
-    background-color: white;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #ff6b6b 100%);
+    position: relative;
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
     padding: 20px;
-    min-width: 300px;
-    height: 60%;
-    width: 25%;
-    border: 1px solid #333;
+    box-sizing: border-box;
 }
 
-.itemBox{
+.myBackground::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(circle at 20% 80%, rgba(255, 107, 107, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(102, 126, 234, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(118, 75, 162, 0.2) 0%, transparent 50%);
+    animation: backgroundFloat 8s ease-in-out infinite;
+}
+
+.myBackground::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image:
+        radial-gradient(2px 2px at 20px 30px, rgba(255, 255, 255, 0.15), transparent),
+        radial-gradient(2px 2px at 40px 70px, rgba(255, 255, 255, 0.1), transparent),
+        radial-gradient(1px 1px at 90px 40px, rgba(255, 255, 255, 0.1), transparent);
+    background-repeat: repeat;
+    background-size: 200px 100px;
+    animation: sparkle 20s linear infinite;
+}
+
+@keyframes backgroundFloat {
+
+    0%,
+    100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-20px) rotate(2deg);
+    }
+}
+
+@keyframes sparkle {
+    from {
+        transform: translateY(0px);
+    }
+
+    to {
+        transform: translateY(-200px);
+    }
+}
+
+/* === WHITE BOX & ITEMS === */
+.whiteBox {
+    backdrop-filter: blur(20px);
+    padding: 40px;
+    min-width: 400px;
+    width: 100%;
+    max-width: 500px;
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.1),
+        0 0 80px rgba(102, 126, 234, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    position: relative;
+    z-index: 1;
+    animation: slideUpFade 1s ease-out;
+    transition: all 0.3s ease;
+    margin: 0 auto;
+}
+
+.whiteBox:hover {
+    transform: translateY(-5px);
+    box-shadow:
+        0 30px 60px rgba(0, 0, 0, 0.15),
+        0 0 100px rgba(102, 126, 234, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+@keyframes slideUpFade {
+    from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.itemBox {
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
-    background-color: rgb(255, 255, 255);
-    height: 80px;
+    background-color: transparent;
+    margin-bottom: 25px;
+    position: relative;
+    animation: itemFadeIn 0.8s ease-out forwards;
+    opacity: 0;
 }
 
-.title{
-    font-size: 30px;
-    color:rgb(153, 24, 24);
+.itemBox:nth-child(1) {
+    animation-delay: 0.2s;
 }
 
-.myForm, .myButton{
+.itemBox:nth-child(2) {
+    animation-delay: 0.4s;
+}
+
+.itemBox:nth-child(3) {
+    animation-delay: 0.6s;
+}
+
+.itemBox:nth-child(4) {
+    animation-delay: 0.8s;
+}
+
+.itemBox:nth-child(5) {
+    animation-delay: 1s;
+}
+
+@keyframes itemFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* === TITLE STYLES === */
+.title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #ff6b6b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+    margin: 0;
+    padding: 20px 0;
+    position: relative;
+    animation: titleGlow 3s ease-in-out infinite alternate;
+}
+
+
+
+.title::after {
+    content: '';
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(135deg, #667eea, #ff6b6b);
+    border-radius: 2px;
+    animation: underlineExpand 2s ease-out;
+}
+
+@keyframes underlineExpand {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 60px;
+    }
+}
+
+/* Dodaj tę klasę do swojego pliku CSS */
+.login-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    /* Biały tekst */
+    text-align: center;
+    margin: 0;
+    padding: 20px 0;
+    position: relative;
+    animation: titleGlow 3s ease-in-out infinite alternate;
+}
+
+/* Alternatywnie możesz użyć gradientu */
+.login-title-gradient {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 50%, #c7d2fe 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+    margin: 0;
+    padding: 20px 0;
+    position: relative;
+    animation: titleGlow 3s ease-in-out infinite alternate;
+}
+
+/* Lub konkretny kolor */
+.login-title-custom {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #10b981;
+    /* Zielony */
+    text-align: center;
+    margin: 0;
+    padding: 20px 0;
+    position: relative;
+    animation: titleGlow 3s ease-in-out infinite alternate;
+}
+
+/* === MATERIAL-UI FORM ENHANCEMENTS === */
+.itemBox .MuiTextField-root,
+.itemBox .MuiFormControl-root {
+    width: 100% !important;
+}
+
+.itemBox .MuiOutlinedInput-root {
+    border-radius: 12px !important;
+    background: rgba(102, 126, 234, 0.03) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative;
+    overflow: hidden;
+    width: 100% !important;
+    height: 56px !important;
+}
+
+.itemBox .MuiOutlinedInput-root::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+    transition: left 0.6s;
+}
+
+.itemBox .MuiOutlinedInput-root:hover::before {
+    left: 100%;
+}
+
+.itemBox .MuiOutlinedInput-root fieldset {
+    border-color: rgba(102, 126, 234, 0.3) !important;
+    border-width: 2px !important;
+    transition: all 0.3s ease !important;
+}
+
+.itemBox .MuiOutlinedInput-root:hover fieldset {
+    border-color: rgba(102, 126, 234, 0.6) !important;
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.1) !important;
+}
+
+.itemBox .MuiOutlinedInput-root.Mui-focused fieldset {
+    border-color: #667eea !important;
+    box-shadow: 0 0 25px rgba(102, 126, 234, 0.2) !important;
+}
+
+.itemBox .MuiInputLabel-root {
+    color: rgba(102, 126, 234, 0.8) !important;
+    font-weight: 500 !important;
+}
+
+.itemBox .MuiInputLabel-root.Mui-focused {
+    color: #667eea !important;
+}
+
+.itemBox .MuiInputBase-input {
+    color: #333 !important;
+    font-weight: 500 !important;
+    width: 100% !important;
+}
+
+/* === BUTTON STYLES === */
+.myButton {
+    width: 100% !important;
+    height: 56px !important;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    border-radius: 12px !important;
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    text-transform: none !important;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    border: none !important;
+}
+
+.myButton::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s;
+}
+
+.myButton:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #ff6b6b 100%) !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 12px 35px rgba(118, 75, 162, 0.4) !important;
+}
+
+.myButton:hover::before {
+    left: 100%;
+}
+
+.myButton:active {
+    transform: translateY(-1px) !important;
+}
+
+.myButton.loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 2px solid transparent;
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes spin {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+
+    100% {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+/* === LINK STYLES === */
+.myLink {
+    color: #667eea !important;
+    text-decoration: none !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    position: relative !important;
+    transition: all 0.3s ease !important;
+    padding: 10px 0 !important;
+}
+
+.myLink::after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background: linear-gradient(135deg, #667eea, #ff6b6b);
+    border-radius: 1px;
+    transition: width 0.3s ease;
+}
+
+.myLink:hover {
+    color: #ff6b6b !important;
+    text-shadow: 0 0 10px rgba(255, 107, 107, 0.3) !important;
+}
+
+.myLink:hover::after {
     width: 100%;
 }
 
-.myButton{
-    background-color: red !important ;
+/* === GLOBAL MUI APPBAR & DRAWER STYLES === */
+.MuiAppBar-root {
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #8b5cf6 100%) !important;
+    backdrop-filter: blur(20px) !important;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.2) !important;
+    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.15) !important;
+    transition: all 0.3s ease !important;
 }
 
-.myButton:hover{
-    background-color: darkred !important;
+.MuiAppBar-root:hover {
+    box-shadow: 0 12px 40px rgba(139, 92, 246, 0.25) !important;
 }
 
-.myLink{
-    color: rgb(153, 24, 24);
-    text-decoration:wavy;  
+.MuiToolbar-root {
+    min-height: 64px !important;
+    padding: 0 24px !important;
+    position: relative !important;
+}
+
+.MuiToolbar-root .MuiTypography-h6 {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 1.3rem !important;
+    background: linear-gradient(135deg, #ffffff 0%, #8b5cf6 50%, #ec4899 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    position: relative !important;
+    letter-spacing: -0.3px !important;
+}
+
+.MuiToolbar-root .MuiTypography-h6::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, #8b5cf6, #ec4899, transparent);
+    border-radius: 1px;
+    animation: titleUnderlineGlow 3s ease-in-out infinite;
+}
+
+@keyframes titleUnderlineGlow {
+
+    0%,
+    100% {
+        opacity: 0.6;
+        transform: scaleX(1);
+        box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scaleX(1.1);
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.6);
+    }
+}
+
+/* === DRAWER STYLES === */
+.MuiDrawer-root .MuiDrawer-paper {
+    background: linear-gradient(180deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%) !important;
+    border-right: 1px solid rgba(139, 92, 246, 0.1) !important;
+    box-shadow: 4px 0 30px rgba(0, 0, 0, 0.3) !important;
+    width: 240px !important;
+    position: fixed !important;
+    overflow: hidden !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    height: 100vh !important;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.MuiDrawer-root .MuiDrawer-paper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+    animation: backgroundPulse 8s ease-in-out infinite;
+}
+
+@keyframes backgroundPulse {
+
+    0%,
+    100% {
+        opacity: 0.8;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+}
+
+.MuiDrawer-root .MuiList-root {
+    padding: 16px 12px !important;
+    position: relative;
+    z-index: 1;
+    flex-grow: 1;
+}
+
+.MuiDrawer-root .MuiListItem-root {
+    margin-bottom: 8px !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+}
+
+.MuiDrawer-root .MuiListItemButton-root {
+    border-radius: 12px !important;
+    padding: 12px 16px !important;
+    margin: 0 !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    background: transparent !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    animation: slideInFromLeft 0.6s ease-out;
+}
+
+.MuiDrawer-root .MuiListItemButton-root:hover {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(236, 72, 153, 0.1) 100%) !important;
+    transform: translateX(6px) scale(1.02) !important;
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.2) !important;
+    color: rgba(255, 255, 255, 1) !important;
+}
+
+.MuiDrawer-root .MuiListItemButton-root.Mui-selected {
+    background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #ec4899 100%) !important;
+    color: white !important;
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4) !important;
+    transform: translateX(8px) scale(1.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.MuiDrawer-root .MuiListItemButton-root::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    transition: left 0.6s ease;
+}
+
+.MuiDrawer-root .MuiListItemButton-root:hover::before {
+    left: 100%;
+}
+
+.MuiDrawer-root .MuiListItemButton-root.Mui-selected::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 20%;
+    bottom: 20%;
+    width: 4px;
+    background: linear-gradient(180deg, #ffffff, rgba(255, 255, 255, 0.5), #ffffff);
+    border-radius: 2px 0 0 2px;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+    animation: activeGlow 2s ease-in-out infinite;
+}
+
+@keyframes activeGlow {
+
+    0%,
+    100% {
+        opacity: 0.8;
+        transform: scaleY(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scaleY(1.2);
+    }
+}
+
+.MuiDrawer-root .MuiListItemIcon-root {
+    min-width: 40px !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+    transition: all 0.3s ease !important;
+}
+
+.MuiDrawer-root .MuiListItemButton-root:hover .MuiListItemIcon-root {
+    color: rgba(255, 255, 255, 1) !important;
+    transform: scale(1.15) rotate(5deg) !important;
+    filter: drop-shadow(0 4px 8px rgba(139, 92, 246, 0.3)) !important;
+}
+
+.MuiDrawer-root .MuiListItemButton-root.Mui-selected .MuiListItemIcon-root {
+    color: white !important;
+    transform: scale(1.2) !important;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3)) !important;
+}
+
+.MuiDrawer-root .MuiListItemText-root .MuiTypography-root {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-weight: 500 !important;
+    font-size: 0.95rem !important;
+    color: inherit !important;
+    transition: all 0.3s ease !important;
+    letter-spacing: 0.3px !important;
+}
+
+.MuiDrawer-root .MuiListItemButton-root:hover .MuiListItemText-root .MuiTypography-root {
+    font-weight: 700 !important;
+    text-shadow: 0 2px 8px rgba(139, 92, 246, 0.3) !important;
+}
+
+/* === COLLAPSED DRAWER STYLES === */
+.collapsed-drawer .MuiDrawer-paper {
+    width: 64px !important;
+}
+
+.collapsed-drawer .MuiListItemButton-root {
+    min-height: 48px !important;
+    justify-content: center !important;
+    padding: 12px 8px !important;
+    margin: 0 8px 8px 8px !important;
+}
+
+.collapsed-drawer .MuiListItemIcon-root {
+    min-width: 0 !important;
+    margin-right: 0 !important;
+    justify-content: center !important;
+}
+
+.collapsed-drawer .MuiListItemText-root {
+    display: none !important;
+}
+
+.collapsed-drawer .MuiListItemButton-root:hover {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(236, 72, 153, 0.15) 100%) !important;
+    transform: scale(1.1) !important;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3) !important;
+}
+
+.collapsed-drawer .MuiListItemButton-root.Mui-selected {
+    transform: scale(1.05) !important;
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4) !important;
+}
+
+.collapsed-drawer .MuiListItemButton-root.Mui-selected::after {
+    right: 2px;
+    width: 3px;
+    height: 50%;
+}
+
+/* === MAIN CONTENT AREA === */
+.MuiBox-root[component="main"] {
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 30%, #16213e 100%) !important;
+    min-height: 100vh !important;
+    position: relative !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.MuiBox-root[component="main"]::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 240px;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(circle at 70% 20%, rgba(139, 92, 246, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 20% 80%, rgba(236, 72, 153, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+    animation: mainBackgroundFloat 12s ease-in-out infinite;
+}
+
+@keyframes mainBackgroundFloat {
+
+    0%,
+    100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+
+    33% {
+        transform: translate(-10px, -15px) rotate(1deg);
+    }
+
+    66% {
+        transform: translate(10px, -10px) rotate(-1deg);
+    }
+}
+
+/* === HOME COMPONENT STYLES === */
+.home-container {
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 30%, #16213e 100%) !important;
+    min-height: 100vh;
+    padding: 2rem;
+    color: white;
+    width: 100%;
+    position: relative;
+}
+
+/* Global background override to prevent white spaces */
+body,
+html,
+#root,
+.MuiBox-root {
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 30%, #16213e 100%) !important;
+}
+
+/* Force dark background for all content inside main */
+.MuiBox-root[component="main"]>* {
+    background: transparent !important;
+}
+
+/* Remove any white backgrounds from MUI components */
+.MuiContainer-root,
+.MuiPaper-root:not(.audiobook-card):not(.author-card):not(.chapter-carousel) {
+    background: transparent !important;
+}
+
+/* Section Headers */
+.home-section-title {
+    font-size: 2.5rem !important;
+    font-weight: 800 !important;
+    margin-bottom: 2rem !important;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #ec4899 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    text-align: center;
+    position: relative;
+}
+
+.home-section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #ec4899);
+    border-radius: 2px;
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+}
+
+/* Audiobooks Grid */
+.audiobooks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-bottom: 4rem;
+}
+
+.audiobook-card {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.1) 100%) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 20px !important;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    cursor: pointer;
+    position: relative;
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.audiobook-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(145deg, rgba(102, 126, 234, 0.1), rgba(236, 72, 153, 0.1));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 0;
+}
+
+.audiobook-card:hover::before {
+    opacity: 1;
+}
+
+.audiobook-card:hover {
+    transform: translateY(-10px) scale(1.02) !important;
+    border: 1px solid rgba(102, 126, 234, 0.4) !important;
+    box-shadow:
+        0 20px 40px rgba(102, 126, 234, 0.2),
+        0 0 80px rgba(236, 72, 153, 0.1) !important;
+}
+
+.audiobook-card .card-content {
+    position: relative;
+    z-index: 1;
+    padding: 1.5rem;
+}
+
+.audiobook-card .card-image {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    margin-bottom: 1rem;
+}
+
+.audiobook-card .card-image img {
+    transition: transform 0.4s ease;
+}
+
+.audiobook-card:hover .card-image img {
+    transform: scale(1.1);
+}
+
+.audiobook-card .card-title {
+    font-size: 1.2rem !important;
+    font-weight: 600 !important;
+    color: #ffffff !important;
+    margin-bottom: 0.5rem !important;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.audiobook-card .card-author {
+    color: rgba(255, 255, 255, 0.7) !important;
+    font-size: 0.9rem !important;
+    margin-bottom: 0.3rem !important;
+}
+
+.audiobook-card .card-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.audiobook-card:hover .play-overlay {
+    opacity: 1 !important;
+}
+
+.audiobook-card .play-overlay {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Authors Section */
+.authors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 4rem;
+}
+
+.author-card {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.08) 100%) !important;
+    backdrop-filter: blur(15px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 16px !important;
+    padding: 2rem !important;
+    transition: all 0.3s ease !important;
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.author-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(145deg, rgba(236, 72, 153, 0.05), rgba(59, 130, 246, 0.05));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.author-card:hover::before {
+    opacity: 1;
+}
+
+.author-card:hover {
+    transform: translateY(-5px) !important;
+    border: 1px solid rgba(236, 72, 153, 0.3) !important;
+    box-shadow: 0 15px 30px rgba(236, 72, 153, 0.2) !important;
+}
+
+.author-card .author-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+    z-index: 1;
+}
+
+.author-card .author-avatar {
+    width: 60px !important;
+    height: 60px !important;
+    background: linear-gradient(135deg, #667eea, #ec4899) !important;
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+.author-card .author-name {
+    font-size: 1.3rem !important;
+    font-weight: 600 !important;
+    color: #ffffff !important;
+    margin-bottom: 0.2rem !important;
+}
+
+.author-card .author-count {
+    color: rgba(255, 255, 255, 0.6) !important;
+    font-size: 0.9rem !important;
+}
+
+.author-card .author-bio {
+    color: rgba(255, 255, 255, 0.7) !important;
+    font-size: 0.9rem !important;
+    line-height: 1.4;
+    margin-top: 1rem;
+    position: relative;
+    z-index: 1;
+}
+
+/* Chapter Carousel */
+.chapter-carousel {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.1) 100%) !important;
+    backdrop-filter: blur(25px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 24px !important;
+    padding: 3rem !important;
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.chapter-carousel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(145deg, rgba(59, 130, 246, 0.03), rgba(139, 92, 246, 0.05));
+    z-index: 0;
+}
+
+.chapter-carousel>* {
+    position: relative;
+    z-index: 1;
+}
+
+.chapter-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.chapter-title {
+    font-size: 2rem !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.chapter-subtitle {
+    font-size: 1.3rem !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    margin-bottom: 1rem !important;
+}
+
+.chapter-duration {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: rgba(255, 255, 255, 0.6) !important;
+    font-size: 0.9rem;
+}
+
+.chapter-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.chapter-control-btn {
+    width: 50px !important;
+    height: 50px !important;
+    background: rgba(139, 92, 246, 0.3) !important;
+    border: 1px solid rgba(139, 92, 246, 0.5) !important;
+    backdrop-filter: blur(10px) !important;
+    transition: all 0.3s ease !important;
+}
+
+.chapter-control-btn:hover {
+    background: rgba(139, 92, 246, 0.5) !important;
+    transform: scale(1.1) !important;
+    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3) !important;
+}
+
+.chapter-control-btn:disabled {
+    background: rgba(139, 92, 246, 0.1) !important;
+    border: 1px solid rgba(139, 92, 246, 0.2) !important;
+    color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.main-play-btn {
+    width: 80px !important;
+    height: 80px !important;
+    background: linear-gradient(135deg, #667eea, #ec4899) !important;
+    border: none !important;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4) !important;
+}
+
+.main-play-btn:hover {
+    background: linear-gradient(135deg, #764ba2, #f472b6) !important;
+    transform: scale(1.15) !important;
+    box-shadow: 0 15px 40px rgba(236, 72, 153, 0.5) !important;
+}
+
+.chapter-progress {
+    text-align: center;
+    margin: 1.5rem 0;
+}
+
+.chapter-progress-text {
+    color: rgba(255, 255, 255, 0.6) !important;
+    font-size: 0.9rem;
+}
+
+.chapter-chips {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 2rem 0;
+    max-height: 100px;
+    overflow-y: auto;
+    padding: 0.5rem;
+}
+
+.chapter-chip {
+    min-width: 50px !important;
+    height: 40px !important;
+    background: rgba(139, 92, 246, 0.2) !important;
+    border: 1px solid rgba(139, 92, 246, 0.4) !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    transition: all 0.3s ease !important;
+    cursor: pointer !important;
+}
+
+.chapter-chip:hover {
+    background: rgba(139, 92, 246, 0.4) !important;
+    transform: scale(1.05) !important;
+}
+
+.chapter-chip.active {
+    background: linear-gradient(135deg, #667eea, #ec4899) !important;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3) !important;
+}
+
+.library-button {
+    background: linear-gradient(135deg, #667eea, #ec4899) !important;
+    color: white !important;
+    border: none !important;
+    padding: 1rem 2rem !important;
+    border-radius: 12px !important;
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    text-transform: none !important;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3) !important;
+    transition: all 0.3s ease !important;
+}
+
+.library-button:hover {
+    background: linear-gradient(135deg, #764ba2, #f472b6) !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 12px 35px rgba(236, 72, 153, 0.4) !important;
+}
+
+.library-button.in-library {
+    background: linear-gradient(135deg, #10b981, #34d399) !important;
+}
+
+.library-button.in-library:hover {
+    background: linear-gradient(135deg, #059669, #10b981) !important;
+}
+
+/* === ENTRANCE ANIMATIONS === */
+@keyframes slideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px) scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* === RESPONSIVE DESIGN === */
+@media (max-width: 768px) {
+    .myBackground {
+        padding: 10px;
+    }
+
+    .whiteBox {
+        min-width: 280px;
+        padding: 30px 20px;
+    }
+
+    .title {
+        font-size: 2rem;
+    }
+
+    .home-container {
+        padding: 1rem 0.5rem;
+    }
+
+    .audiobooks-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 1rem;
+    }
+
+    .home-section-title {
+        font-size: 1.8rem !important;
+    }
+
+    .collapsed-drawer .MuiDrawer-paper {
+        width: 56px !important;
+    }
+}
+
+@media (min-width: 1400px) {
+    .whiteBox {
+        width: 450px;
+    }
+
+    .home-container {
+        padding: 3rem 4rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .audiobooks-grid {
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 2.5rem;
+    }
+}
+
+/* === TOOLTIPS === */
+.MuiTooltip-tooltip {
+    background: linear-gradient(135deg, #667eea, #764ba2) !important;
+    color: white !important;
+    font-size: 0.875rem !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3) !important;
+}
+
+/* === SCROLLBAR === */
+.MuiDrawer-root .MuiDrawer-paper::-webkit-scrollbar {
+    width: 8px;
+}
+
+.MuiDrawer-root .MuiDrawer-paper::-webkit-scrollbar-track {
+    background: rgba(139, 92, 246, 0.1);
+    border-radius: 4px;
+}
+
+.MuiDrawer-root .MuiDrawer-paper::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #8b5cf6, #ec4899);
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+}
+
+/* === FOCUS STATES === */
+.myButton:focus-visible,
+.myLink:focus-visible,
+.MuiListItemButton-root:focus-visible {
+    outline: 2px solid #8b5cf6 !important;
+    outline-offset: 2px !important;
+}
+
+/* === LOADING STATES === */
+.myButton.loading {
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+/* === DIVIDERS === */
+.MuiDrawer-root .MuiDivider-root {
+    background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.3), transparent) !important;
+    height: 1px !important;
+    margin: 16px 20px !important;
+    border: none !important;
+}
+
+/* === ACCESSIBILITY === */
+@media (prefers-reduced-motion: reduce) {
+
+    .audiobook-card,
+    .MuiListItemButton-root,
+    .myButton,
+    * {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .audiobook-card:hover,
+    .MuiListItemButton-root:hover {
+        transform: none !important;
+    }
+}
+
+@media (hover: none) {
+    .audiobook-card:hover {
+        transform: none !important;
+    }
+
+    .audiobook-card:active {
+        transform: scale(0.98) !important;
+    }
+}
+
+/* === UTILITY CLASSES === */
+.section-divider {
+    margin: 4rem 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.3), rgba(236, 72, 153, 0.3), transparent) !important;
+    border: none;
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    gap: 1rem;
+}
+
+.loading-text {
+    color: rgba(255, 255, 255, 0.8) !important;
+    font-size: 1.2rem;
+}
+
+/* === ANIMATION DELAYS === */
+.MuiDrawer-root .MuiListItem-root:nth-child(1) .MuiListItemButton-root {
+    animation-delay: 0.1s;
+}
+
+.MuiDrawer-root .MuiListItem-root:nth-child(2) .MuiListItemButton-root {
+    animation-delay: 0.2s;
+}
+
+.MuiDrawer-root .MuiListItem-root:nth-child(3) .MuiListItemButton-root {
+    animation-delay: 0.3s;
+}
+
+.MuiDrawer-root .MuiListItem-root:nth-child(4) .MuiListItemButton-root {
+    animation-delay: 0.4s;
+}
+
+.audiobook-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.audiobook-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.audiobook-card:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.audiobook-card:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+.audiobook-card:nth-child(5) {
+    animation-delay: 0.5s;
+}
+
+.audiobook-card:nth-child(6) {
+    animation-delay: 0.6s;
 }
