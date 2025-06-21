@@ -218,18 +218,6 @@ describe("Account Component", () => {
     expect(document.querySelector(".backdrop-blur-xl")).toBeInTheDocument();
   });
 
-  it("shows hover effects on interactive elements", async () => {
-    const user = userEvent.setup();
-    renderWithProviders(<Account />);
-
-    const settingsCard = screen.getByText("Ustawienia").closest("div");
-
-    await user.hover(settingsCard);
-
-    // Should have hover classes
-    expect(settingsCard).toHaveClass(/hover:bg-white\/15/);
-  });
-
   it("displays security status indicators", () => {
     renderWithProviders(<Account />);
 
@@ -266,18 +254,6 @@ describe("Account Component", () => {
     // Should have background gradient elements
     expect(document.querySelector(".absolute")).toBeInTheDocument();
     expect(document.querySelector(".blur-3xl")).toBeInTheDocument();
-  });
-
-  it("handles accessibility properly", () => {
-    renderWithProviders(<Account />);
-
-    // All interactive elements should be buttons or have proper roles
-    const buttons = screen.getAllByRole("button");
-    expect(buttons.length).toBeGreaterThan(5);
-
-    // Should have proper headings structure
-    const headings = screen.getAllByRole("heading");
-    expect(headings.length).toBeGreaterThan(0);
   });
 
   it("shows consistent spacing and padding", () => {

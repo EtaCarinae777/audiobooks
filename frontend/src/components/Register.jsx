@@ -221,11 +221,16 @@ const Register = () => {
 
           {/* Email Field */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-white/80">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-white/80"
+            >
               Adres email
             </label>
             <Controller
+              id="email"
               name="email"
+              type="email"
               control={control}
               rules={{
                 required: "Email jest wymagany",
@@ -237,6 +242,7 @@ const Register = () => {
               render={({ field }) => (
                 <input
                   {...field}
+                  id="email"
                   type="email"
                   className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-300"
                   placeholder="twoj@email.com"
@@ -259,12 +265,17 @@ const Register = () => {
 
           {/* Password Field */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-white/80">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-white/80"
+            >
               Hasło
             </label>
             <div className="relative">
               <Controller
+                id="password"
                 name="password"
+                type="password"
                 control={control}
                 rules={{
                   required: "Hasło jest wymagane",
@@ -276,6 +287,7 @@ const Register = () => {
                 render={({ field }) => (
                   <input
                     {...field}
+                    id="password"
                     type={showPassword ? "text" : "password"}
                     className="w-full px-4 py-3 pr-12 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-300"
                     placeholder="••••••••"
@@ -301,12 +313,17 @@ const Register = () => {
 
           {/* Confirm Password Field */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-white/80">
+            <label
+              htmlFor="password2"
+              className="block text-sm font-medium text-white/80"
+            >
               Potwierdź hasło
             </label>
             <div className="relative">
               <Controller
+                id="password2"
                 name="password2"
+                type="password"
                 control={control}
                 rules={{
                   required: "Potwierdzenie hasła jest wymagane",
@@ -314,6 +331,7 @@ const Register = () => {
                 render={({ field }) => (
                   <input
                     {...field}
+                    id="password2"
                     type={showPassword2 ? "text" : "password"}
                     className="w-full px-4 py-3 pr-12 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-300"
                     placeholder="••••••••"

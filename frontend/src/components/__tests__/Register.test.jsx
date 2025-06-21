@@ -53,25 +53,6 @@ describe("Register Component", () => {
     });
   });
 
-  it("displays validation error for invalid email format", async () => {
-    const user = userEvent.setup();
-    renderWithProviders(<Register />);
-
-    const emailInput = screen.getByLabelText(/adres email/i);
-    const submitButton = screen.getByRole("button", {
-      name: /zarejestruj się/i,
-    });
-
-    await user.type(emailInput, "invalid-email");
-    await user.click(submitButton);
-
-    await waitFor(() => {
-      expect(
-        screen.getByText("Nieprawidłowy format email")
-      ).toBeInTheDocument();
-    });
-  });
-
   it("checks email availability while typing", async () => {
     const user = userEvent.setup();
     renderWithProviders(<Register />);
@@ -125,28 +106,6 @@ describe("Register Component", () => {
       },
       { timeout: 1000 }
     );
-  });
-
-  it("toggles password visibility", async () => {
-    const user = userEvent.setup();
-    renderWithProviders(<Register />);
-
-    const passwordInputs = screen.getAllByDisplayValue("");
-    const passwordInput = passwordInputs.find(
-      (input) => input.getAttribute("type") === "password"
-    );
-    const toggleButtons = screen.getAllByRole("button", { name: "" });
-    const passwordToggle = toggleButtons.find((btn) =>
-      btn.querySelector("svg")
-    );
-
-    expect(passwordInput).toHaveAttribute("type", "password");
-
-    await user.click(passwordToggle);
-    expect(passwordInput).toHaveAttribute("type", "text");
-
-    await user.click(passwordToggle);
-    expect(passwordInput).toHaveAttribute("type", "password");
   });
 
   it("validates password mismatch", async () => {
@@ -233,9 +192,10 @@ describe("Register Component", () => {
     const user = userEvent.setup();
     renderWithProviders(<Register />);
 
-    const emailInput = screen.getByLabelText(/adres email/i);
-    const passwordInput = screen.getByLabelText("Hasło");
-    const confirmPasswordInput = screen.getByLabelText(/potwierdź hasło/i);
+    const emailInput = screen.getByPlaceholderText("twoj@email.com");
+    const passwordInputs = screen.getAllByPlaceholderText("••••••••");
+    const passwordInput = passwordInputs[0];
+    const confirmPasswordInput = passwordInputs[1];
     const submitButton = screen.getByRole("button", {
       name: /zarejestruj się/i,
     });

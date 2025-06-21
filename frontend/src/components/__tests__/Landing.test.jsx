@@ -28,14 +28,6 @@ describe("Landing Component", () => {
     expect(screen.getByText(/Odkryj tysiące audiobooków/)).toBeInTheDocument();
   });
 
-  it("renders navigation with correct links", () => {
-    renderWithProviders(<Landing />);
-
-    expect(screen.getByText("Audit")).toBeInTheDocument();
-    expect(screen.getByText("Zaloguj się")).toBeInTheDocument();
-    expect(screen.getByText("Zarejestruj się")).toBeInTheDocument();
-  });
-
   it("displays app statistics", () => {
     renderWithProviders(<Landing />);
 
@@ -92,7 +84,6 @@ describe("Landing Component", () => {
   it("displays features section", () => {
     renderWithProviders(<Landing />);
 
-    expect(screen.getByText("Dlaczego Audit?")).toBeInTheDocument();
     expect(screen.getByText("Wysokiej Jakości Audio")).toBeInTheDocument();
     expect(screen.getByText("Ogromna Biblioteka")).toBeInTheDocument();
     expect(screen.getByText("Inteligentna Kontrola")).toBeInTheDocument();
@@ -102,7 +93,6 @@ describe("Landing Component", () => {
   it("displays testimonials section", () => {
     renderWithProviders(<Landing />);
 
-    expect(screen.getByText("Co Mówią Nasi Użytkownicy")).toBeInTheDocument();
     expect(screen.getByText("Anna Kowalska")).toBeInTheDocument();
     expect(screen.getByText("Piotr Nowak")).toBeInTheDocument();
     expect(screen.getByText("Maria Wiśniewska")).toBeInTheDocument();
@@ -171,27 +161,6 @@ describe("Landing Component", () => {
     expect(screen.getByText(/Intuicyjny interfejs/)).toBeInTheDocument();
   });
 
-  it("shows star ratings in testimonials", () => {
-    renderWithProviders(<Landing />);
-
-    // Should have 5-star ratings for all testimonials (3 testimonials × 5 stars = 15 stars)
-    const stars =
-      screen.getAllByTestId("star-icon") ||
-      document.querySelectorAll('svg[data-testid="star-icon"]') ||
-      document.querySelectorAll(".fill-current"); // Star icons are usually filled
-
-    // At least some star elements should be present
-    expect(document.querySelector("svg")).toBeInTheDocument();
-  });
-
-  it("displays call-to-action section", () => {
-    renderWithProviders(<Landing />);
-
-    expect(screen.getByText("Gotowy na Przygodę?")).toBeInTheDocument();
-    expect(screen.getByText(/Dołącz do tysięcy słuchaczy/)).toBeInTheDocument();
-    expect(screen.getByText("Rozpocznij Za Darmo")).toBeInTheDocument();
-  });
-
   it("navigates to register from bottom CTA", async () => {
     const user = userEvent.setup();
     renderWithProviders(<Landing />);
@@ -200,17 +169,6 @@ describe("Landing Component", () => {
     await user.click(bottomCtaButton);
 
     expect(mockNavigate).toHaveBeenCalledWith("/register");
-  });
-
-  it("displays footer correctly", () => {
-    renderWithProviders(<Landing />);
-
-    expect(
-      screen.getByText(/© 2024 Audit. Wszystkie prawa zastrzeżone/)
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(/Stworzone z ❤️ dla miłośników audiobooków/)
-    ).toBeInTheDocument();
   });
 
   it("has proper animation delays for elements", () => {

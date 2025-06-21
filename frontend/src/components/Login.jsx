@@ -164,7 +164,10 @@ const Login = () => {
 
           {/* Email Field */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-white/80">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-white/80"
+            >
               Adres email
             </label>
             <Controller
@@ -179,6 +182,7 @@ const Login = () => {
               }}
               render={({ field }) => (
                 <input
+                  id="email"
                   {...field}
                   type="email"
                   className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-300"
@@ -193,7 +197,10 @@ const Login = () => {
 
           {/* Password Field */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-white/80">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-white/80"
+            >
               Hasło
             </label>
             <div className="relative">
@@ -210,6 +217,7 @@ const Login = () => {
                 render={({ field }) => (
                   <input
                     {...field}
+                    id="password"
                     type={showPassword ? "text" : "password"}
                     className="w-full px-4 py-3 pr-12 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-300"
                     placeholder="••••••••"

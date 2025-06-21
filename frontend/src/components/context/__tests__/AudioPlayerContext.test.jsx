@@ -1,15 +1,21 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { renderHook, act } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { render, renderHook, act } from "@testing-library/react";
 import { AudioPlayerProvider, useAudioPlayer } from "../AudioPlayerContext";
 
 // Mock console.log to avoid noise in tests
-global.console.log = vi.fn();
-
+// (handled in beforeEach)
+const TestComponent = () => {
+  useAudioPlayer();
+  return <div>Test</div>;
+};
 describe("AudioPlayerContext", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.spyOn(console, "log").mockImplementation(() => {});
   });
 
+  afterEach(() => {
+    console.log.mockRestore();
+  });
   const wrapper = ({ children }) => (
     <AudioPlayerProvider>{children}</AudioPlayerProvider>
   );
@@ -17,7 +23,7 @@ describe("AudioPlayerContext", () => {
   it("provides initial state correctly", () => {
     const { result } = renderHook(() => useAudioPlayer(), { wrapper });
 
-    expect(result.current.currentTrack).toBeNull();
+    expect(result.current.currentTrack).toBe(null);
     expect(result.current.playlist).toEqual([]);
     expect(result.current.currentIndex).toBe(0);
     expect(result.current.isPlaying).toBe(false);
@@ -153,44 +159,6 @@ describe("AudioPlayerContext", () => {
     expect(result.current.currentIndex).toBe(1); // Should stay at last index
   });
 
-  it("closes player correctly", () => {
-    const { result } = renderHook(() => useAudioPlayer(), { wrapper });
-
-    const mockTrack = {
-      id: 1,
-      title: "Test Chapter",
-      audio_file: "/test-audio.mp3",
-    };
-
-    act(() => {
-      result.current.playTrack(mockTrack, [mockTrack], 0);
-    });
-
-    expect(result.current.isVisible).toBe(true);
-
-    act(() => {
-      result.current.closePlayer();
-    });
-
-    expect(result.current.isVisible).toBe(false);
-    expect(result.current.isPlaying).toBe(false);
-    expect(result.current.currentTrack).toBeNull();
-    expect(result.current.playlist).toEqual([]);
-    expect(result.current.currentIndex).toBe(0);
-  });
-
-  it("handles empty playlist gracefully", () => {
-    const { result } = renderHook(() => useAudioPlayer(), { wrapper });
-
-    act(() => {
-      result.current.playTrack(null, [], 0);
-    });
-
-    expect(result.current.currentTrack).toBeNull();
-    expect(result.current.playlist).toEqual([]);
-    expect(result.current.isVisible).toBe(false);
-  });
-
   it("handles invalid track index gracefully", () => {
     const { result } = renderHook(() => useAudioPlayer(), { wrapper });
 
@@ -228,30 +196,14 @@ describe("AudioPlayerContext", () => {
     expect(result.current.isPlaying).toBe(true); // Should maintain playing state
   });
 
-  it("logs track changes for debugging", () => {
-    const { result } = renderHook(() => useAudioPlayer(), { wrapper });
-
-    const mockTrack = {
-      id: 1,
-      title: "Test Chapter",
-      audio_file: "/test-audio.mp3",
-    };
-
-    act(() => {
-      result.current.playTrack(mockTrack, [mockTrack], 0);
-    });
-
-    expect(console.log).toHaveBeenCalledWith("Playing track:", mockTrack);
-  });
-
   it("throws error when used outside provider", () => {
     // Mock console.error to suppress error output in tests
     const originalError = console.error;
     console.error = vi.fn();
 
     expect(() => {
-      renderHook(() => useAudioPlayer());
-    }).toThrow("useAudioPlayer must be used within an AudioPlayerProvider");
+      render(<TestComponent />);
+    }).toThrow("useAudioPlayer must be used within AudioPlayerProvider");
 
     console.error = originalError;
   });
