@@ -22,4 +22,5 @@ urlpatterns = router.urls + [
     path('payments/confirm/', confirm_payment, name='confirm-payment'),
     path('payments/config/', get_stripe_config, name='stripe-config'),
     path('auth/google/', google_auth, name='google_auth'),
+    
 ]

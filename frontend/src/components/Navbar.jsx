@@ -1,58 +1,29 @@
-import * as React from "react";
-import { useState, useEffect } from "react";
-import Box from "@mui/material/Box";
-import Drawer from "@mui/material/Drawer";
-import CssBaseline from "@mui/material/CssBaseline";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import List from "@mui/material/List";
-import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import IconButton from "@mui/material/IconButton";
-import Tooltip from "@mui/material/Tooltip";
-import Avatar from "@mui/material/Avatar";
-import Chip from "@mui/material/Chip";
-import Button from "@mui/material/Button";
-import HomeIcon from "@mui/icons-material/Home";
-import LogoutIcon from "@mui/icons-material/Logout";
-import MenuIcon from "@mui/icons-material/Menu";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import SearchIcon from "@mui/icons-material/Search";
-import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import CheckCircle from "@mui/icons-material/CheckCircle";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import AxiosInstance from "./AxiosInstance";
+import {
+  Home,
+  LogOut,
+  Search,
+  Library,
+  Headphones,
+  User,
+  CheckCircle,
+} from "lucide-react";
 
-const drawerWidth = 240;
-const miniDrawerWidth = 64;
-
-export default function Navbar(props) {
+const Navbar = (props) => {
   const { content } = props;
   const location = useLocation();
   const path = location.pathname;
   const navigate = useNavigate();
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
 
   // Pobierz informacje o zalogowanym użytkowniku
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        // Możesz stworzyć endpoint /me/ albo użyć istniejącego
-        // Na razie użyjmy localStorage do pokazania email
         const token = localStorage.getItem("Token");
         if (token) {
-          // Tutaj normalnie robiłbyś request do API
-          // const response = await AxiosInstance.get('me/');
-          // setUserInfo(response.data);
-
-          // Tymczasowo - weź email z localStorage jeśli go tam zapisujesz
-          // Albo ustaw domyślne info
           setUserInfo({
             email: "user@example.com", // Tymczasowo
             isLoggedIn: true,
@@ -74,363 +45,140 @@ export default function Navbar(props) {
     });
   };
 
-  const toggleDrawer = () => {
-    setIsCollapsed(!isCollapsed);
-  };
-
   const menuItems = [
     {
       key: "home",
       path: "/home",
-      icon: <HomeIcon />,
-      label: "Home",
-      tooltip: "Strona główna",
+      icon: Home,
+      label: "Strona główna",
     },
     {
       key: "search",
       path: "/search",
-      icon: <SearchIcon />,
-      label: "Search",
-      tooltip: "Wyszukaj",
+      icon: Search,
+      label: "Wyszukaj",
     },
     {
       key: "library",
       path: "/yourlibrary",
-      icon: <LibraryBooksIcon />,
-      label: "Your Library",
-      tooltip: "Twoja biblioteka",
+      icon: Library,
+      label: "Twoja biblioteka",
     },
     {
       key: "account",
       path: "/account",
-      icon: <AccountCircleIcon />,
-      label: "Account",
-      tooltip: "Konto",
+      icon: User,
+      label: "Konto",
     },
   ];
 
-  const currentDrawerWidth = isCollapsed ? miniDrawerWidth : drawerWidth;
-
   return (
-    <Box sx={{ display: "flex" }}>
-      <CssBaseline />
-      <AppBar
-        position="fixed"
-        sx={{
-          width: `calc(100% - ${currentDrawerWidth}px)`,
-          ml: `${currentDrawerWidth}px`,
-          transition: "width 0.3s ease, margin 0.3s ease",
-        }}
-      >
-        <Toolbar sx={{ justifyContent: "space-between" }}>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            {isCollapsed && (
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                onClick={toggleDrawer}
-                edge="start"
-                sx={{
-                  mr: 2,
-                  background: "rgba(255, 255, 255, 0.1)",
-                  "&:hover": {
-                    background: "rgba(255, 255, 255, 0.2)",
-                    transform: "scale(1.1)",
-                  },
-                  transition: "all 0.3s ease",
-                }}
+    <div className="flex min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800">
+      {/* Sidebar */}
+      <div className="w-64 bg-white/10 backdrop-blur-xl border-r border-white/20 flex flex-col">
+        {/* Header */}
+        <div className="flex items-center h-16 px-6 border-b border-white/10">
+          <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+            <Headphones className="w-5 h-5 text-white" />
+          </div>
+          <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            Audit
+          </span>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 p-4 space-y-2">
+          {menuItems.map((item) => {
+            const IconComponent = item.icon;
+            const isActive = item.path === path;
+
+            return (
+              <Link
+                key={item.key}
+                to={item.path}
+                className={`flex items-center space-x-3 px-3 py-3 rounded-xl transition-all duration-300 hover:translate-x-1 ${
+                  isActive
+                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
+                    : "text-white/70 hover:text-white hover:bg-white/10"
+                }`}
               >
-                <MenuIcon />
-              </IconButton>
-            )}
-            <Typography variant="h6" noWrap component="div">
-              Audit
-            </Typography>
-          </Box>
+                <IconComponent
+                  className={`w-5 h-5 ${
+                    isActive ? "text-white" : "text-white/70"
+                  }`}
+                />
+                <span className="font-medium">{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
 
-          {/* Status zalogowania */}
-          {userInfo && (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <Chip
-                icon={<CheckCircle />}
-                label="Zalogowany"
-                variant="filled"
-                sx={{
-                  background: "rgba(76, 175, 80, 0.2)",
-                  color: "#4caf50",
-                  border: "1px solid rgba(76, 175, 80, 0.3)",
-                  "& .MuiChip-icon": {
-                    color: "#4caf50",
-                  },
-                }}
-              />
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  background: "rgba(255, 255, 255, 0.1)",
-                  borderRadius: "20px",
-                  padding: "4px 12px",
-                }}
-              >
-                <Avatar
-                  sx={{
-                    width: 32,
-                    height: 32,
-                    background: "linear-gradient(135deg, #667eea, #ec4899)",
-                    fontSize: "0.9rem",
-                  }}
-                >
-                  {userInfo.email?.charAt(0).toUpperCase() || "U"}
-                </Avatar>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: "white",
-                    fontWeight: 500,
-                    display: { xs: "none", sm: "block" },
-                  }}
-                >
-                  {userInfo.email || "Użytkownik"}
-                </Typography>
-              </Box>
-            </Box>
-          )}
-        </Toolbar>
-      </AppBar>
-
-      <Drawer
-        sx={{
-          width: currentDrawerWidth,
-          flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            width: currentDrawerWidth,
-            boxSizing: "border-box",
-            transition: "width 0.3s ease",
-            overflowX: "hidden",
-          },
-        }}
-        variant="permanent"
-        anchor="left"
-        className={isCollapsed ? "collapsed-drawer" : "expanded-drawer"}
-      >
-        <Toolbar
-          sx={{
-            display: "flex",
-            justifyContent: isCollapsed ? "center" : "flex-end",
-            px: isCollapsed ? 1 : 2,
-          }}
-        >
-          {!isCollapsed && (
-            <IconButton
-              onClick={toggleDrawer}
-              sx={{
-                color: "rgba(255, 255, 255, 0.8)",
-                "&:hover": {
-                  color: "white",
-                  background: "rgba(255, 255, 255, 0.1)",
-                  transform: "scale(1.1)",
-                },
-                transition: "all 0.3s ease",
-              }}
-            >
-              <ChevronLeftIcon />
-            </IconButton>
-          )}
-          {isCollapsed && (
-            <IconButton
-              onClick={toggleDrawer}
-              sx={{
-                color: "rgba(255, 255, 255, 0.8)",
-                "&:hover": {
-                  color: "white",
-                  background: "rgba(255, 255, 255, 0.1)",
-                  transform: "scale(1.1)",
-                },
-                transition: "all 0.3s ease",
-              }}
-            >
-              <MenuIcon />
-            </IconButton>
-          )}
-        </Toolbar>
-
-        <Divider />
-
-        <List sx={{ mt: 1 }}>
-          {menuItems.map((item) => (
-            <ListItem key={item.key} disablePadding>
-              <Tooltip
-                title={isCollapsed ? item.tooltip : ""}
-                placement="right"
-                arrow
-              >
-                <ListItemButton
-                  component={Link}
-                  to={item.path}
-                  selected={item.path === path}
-                  sx={{
-                    minHeight: 48,
-                    justifyContent: isCollapsed ? "center" : "initial",
-                    px: isCollapsed ? 1.5 : 2,
-                    borderRadius: isCollapsed ? "12px" : "12px",
-                    mx: isCollapsed ? 1 : 1.5,
-                    mb: 1,
-                    transition: "all 0.3s ease",
-                    "&:hover": {
-                      transform: isCollapsed ? "scale(1.1)" : "translateX(6px)",
-                    },
-                  }}
-                >
-                  <ListItemIcon
-                    sx={{
-                      minWidth: 0,
-                      mr: isCollapsed ? 0 : 3,
-                      justifyContent: "center",
-                      transition: "all 0.3s ease",
-                    }}
-                  >
-                    {item.icon}
-                  </ListItemIcon>
-                  {!isCollapsed && (
-                    <ListItemText
-                      primary={item.label}
-                      sx={{
-                        opacity: isCollapsed ? 0 : 1,
-                        transition: "opacity 0.3s ease",
-                      }}
-                    />
-                  )}
-                </ListItemButton>
-              </Tooltip>
-            </ListItem>
-          ))}
-        </List>
-
-        {/* User info section (tylko gdy nie collapsed) */}
-        {!isCollapsed && userInfo && (
-          <Box sx={{ mt: "auto", mb: 2, mx: 2 }}>
-            <Divider sx={{ mb: 2 }} />
-            <Box
-              sx={{
-                background: "rgba(255, 255, 255, 0.1)",
-                borderRadius: "12px",
-                p: 2,
-                textAlign: "center",
-              }}
-            >
-              <Avatar
-                sx={{
-                  width: 48,
-                  height: 48,
-                  mx: "auto",
-                  mb: 1,
-                  background: "linear-gradient(135deg, #667eea, #ec4899)",
-                }}
-              >
+        {/* User Section */}
+        {userInfo && (
+          <div className="p-4 border-t border-white/10">
+            <div className="bg-white/10 rounded-xl p-4 text-center space-y-3">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto text-lg font-bold text-white">
                 {userInfo.email?.charAt(0).toUpperCase() || "U"}
-              </Avatar>
-              <Typography
-                variant="body2"
-                sx={{
-                  color: "white",
-                  fontWeight: "bold",
-                  mb: 0.5,
-                }}
-              >
-                Witaj!
-              </Typography>
-              <Typography
-                variant="caption"
-                sx={{
-                  color: "rgba(255, 255, 255, 0.7)",
-                  display: "block",
-                  mb: 1,
-                }}
-              >
-                {userInfo.email}
-              </Typography>
-              <Chip
-                icon={<CheckCircle />}
-                label="Online"
-                size="small"
-                sx={{
-                  background: "rgba(76, 175, 80, 0.2)",
-                  color: "#4caf50",
-                  border: "1px solid rgba(76, 175, 80, 0.3)",
-                }}
-              />
-            </Box>
-          </Box>
+              </div>
+              <div>
+                <p className="text-white font-semibold text-sm">Witaj!</p>
+                <p className="text-white/70 text-xs truncate">
+                  {userInfo.email}
+                </p>
+              </div>
+              <div className="flex items-center justify-center space-x-2 px-3 py-1 bg-emerald-500/20 border border-emerald-500/30 rounded-full">
+                <CheckCircle className="w-3 h-3 text-emerald-400" />
+                <span className="text-emerald-400 text-xs font-medium">
+                  Online
+                </span>
+              </div>
+            </div>
+          </div>
         )}
 
-        {/* Logout button at bottom */}
-        <Box sx={{ mt: isCollapsed ? "auto" : 1, mb: 2 }}>
-          <Divider sx={{ mb: 1 }} />
-          <ListItem disablePadding>
-            <Tooltip
-              title={isCollapsed ? "Wyloguj się" : ""}
-              placement="right"
-              arrow
-            >
-              <ListItemButton
-                onClick={logoutUser}
-                sx={{
-                  minHeight: 48,
-                  justifyContent: isCollapsed ? "center" : "initial",
-                  px: isCollapsed ? 1.5 : 2,
-                  borderRadius: "12px",
-                  mx: isCollapsed ? 1 : 1.5,
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    transform: isCollapsed ? "scale(1.1)" : "translateX(6px)",
-                    background: "rgba(244, 67, 54, 0.2)",
-                  },
-                }}
-              >
-                <ListItemIcon
-                  sx={{
-                    minWidth: 0,
-                    mr: isCollapsed ? 0 : 3,
-                    justifyContent: "center",
-                    color: "#f44336",
-                    transition: "all 0.3s ease",
-                  }}
-                >
-                  <LogoutIcon />
-                </ListItemIcon>
-                {!isCollapsed && (
-                  <ListItemText
-                    primary="Logout"
-                    sx={{
-                      opacity: isCollapsed ? 0 : 1,
-                      transition: "opacity 0.3s ease",
-                      "& .MuiTypography-root": {
-                        color: "#f44336",
-                      },
-                    }}
-                  />
-                )}
-              </ListItemButton>
-            </Tooltip>
-          </ListItem>
-        </Box>
-      </Drawer>
+        {/* Logout Button */}
+        <div className="p-4 border-t border-white/10">
+          <button
+            onClick={logoutUser}
+            className="w-full flex items-center space-x-3 px-3 py-3 rounded-xl text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-300 hover:translate-x-1"
+          >
+            <LogOut className="w-5 h-5" />
+            <span className="font-medium">Wyloguj</span>
+          </button>
+        </div>
+      </div>
 
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          bgcolor: "background.default",
-          p: 3,
-          width: `calc(100% - ${currentDrawerWidth}px)`,
-          transition: "width 0.3s ease",
-        }}
-      >
-        <Toolbar />
-        {content}
-      </Box>
-    </Box>
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col">
+        {/* Top Bar */}
+        <header className="h-16 bg-white/10 backdrop-blur-xl border-b border-white/20 flex items-center justify-between px-6">
+          <h1 className="text-xl font-bold text-white"></h1> {/* User Status */}
+          {userInfo && (
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2 px-3 py-1 bg-emerald-500/20 border border-emerald-500/30 rounded-full">
+                <CheckCircle className="w-4 h-4 text-emerald-400" />
+                <span className="text-emerald-400 text-sm font-medium">
+                  Zalogowany
+                </span>
+              </div>
+
+              <div className="flex items-center space-x-3 bg-white/10 rounded-full px-3 py-2">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-sm font-bold text-white">
+                  {userInfo.email?.charAt(0).toUpperCase() || "U"}
+                </div>
+                <span className="text-white text-sm font-medium hidden sm:block">
+                  {userInfo.email || "Użytkownik"}
+                </span>
+              </div>
+            </div>
+          )}
+        </header>
+
+        {/* Page Content */}
+        <main className="flex-1 overflow-auto">{content}</main>
+      </div>
+    </div>
   );
-}
+};
+
+export default Navbar;
