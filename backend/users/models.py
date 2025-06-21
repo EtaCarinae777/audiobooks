@@ -37,6 +37,9 @@ class CustomUser(AbstractUser):
     birthday = models.DateField(null = True, blank = True)
     username = models.CharField(max_length=200, null=True, blank=True)
 
+    google_id = models.CharField(max_length=100, blank=True, null=True, unique=True)
+    profile_picture = models.URLField(blank=True, null=True)
+
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'

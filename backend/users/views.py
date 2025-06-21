@@ -8,14 +8,20 @@ from knox.models import AuthToken
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import action
+from rest_framework import status
 from django.shortcuts import get_object_or_404
 from django.db.models import Q, Avg
 import stripe
 from django.conf import settings
+from google.auth.transport import requests
+from google.oauth2 import id_token
+from google.auth.exceptions import GoogleAuthError
+from knox.models import AuthToken
+import logging
 
 User = get_user_model()
 stripe.api_key = settings.STRIPE_SECRET_KEY
-
+logger = logging.getLogger(__name__)
 class LoginViewset(viewsets.ViewSet):
     permission_classes = [permissions.AllowAny]
     serializer_class = LoginSerializer
@@ -564,3 +570,117 @@ def get_stripe_config(request):
     return Response({
         'publishable_key': settings.STRIPE_PUBLISHABLE_KEY
     })
+
+# do Gogla ni
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def google_auth(request):
+    """
+    Endpoint do logowania przez Google OAuth z Knox
+    """
+    token = request.data.get('token')
+    
+    if not token:
+        return Response(
+            {'error': 'Token jest wymagany'}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        # Weryfikacja tokenu z Google
+        idinfo = id_token.verify_oauth2_token(
+            token, 
+            requests.Request(), 
+            settings.GOOGLE_CLIENT_ID,
+            clock_skew_in_seconds=60  # Dopuszczalny margines czasu
+            
+        )
+        
+        # Sprawdź czy token jest dla naszej aplikacji
+        if idinfo['aud'] != settings.GOOGLE_CLIENT_ID:
+            logger.error(f"Token audience mismatch: {idinfo['aud']}")
+            return Response(
+                {'error': 'Nieprawidłowy token'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Pobierz dane użytkownika z tokenu
+        google_id = idinfo['sub']
+        email = idinfo['email']
+        first_name = idinfo.get('given_name', '')
+        last_name = idinfo.get('family_name', '')
+        profile_picture = idinfo.get('picture', '')
+        
+        logger.info(f"Google auth attempt for email: {email}")
+        
+        # Sprawdź czy użytkownik już istnieje
+        user = None
+        created = False
+        
+        # Najpierw sprawdź po google_id
+        if google_id:
+            try:
+                user = User.objects.get(google_id=google_id)
+            except User.DoesNotExist:
+                pass
+        
+        # Jeśli nie znaleziono po google_id, sprawdź po email
+        if not user:
+            try:
+                user = User.objects.get(email=email)
+                # Połącz istniejące konto z Google
+                user.google_id = google_id
+                user.profile_picture = profile_picture
+                user.save()
+                logger.info(f"Linked existing account {email} with Google")
+            except User.DoesNotExist:
+                # Utwórz nowego użytkownika
+                user = User.objects.create_user(
+                    username=email,
+                    email=email,
+                    first_name=first_name,
+                    last_name=last_name,
+                    google_id=google_id,
+                    profile_picture=profile_picture
+                )
+                created = True
+                logger.info(f"Created new user via Google: {email}")
+        
+        # KNOX - utwórz token (automatycznie usuwa stare tokeny jeśli przekroczony limit)
+        instance, knox_token = AuthToken.objects.create(user=user)
+        
+        # Przygotuj odpowiedź
+        user_data = {
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'profile_picture': user.profile_picture,
+        }
+        
+        return Response({
+            'token': knox_token,  # Knox token (nie .key!)
+            'user': user_data,
+            'created': created,
+            'message': 'Pomyślnie zalogowano przez Google'
+        }, status=status.HTTP_200_OK)
+        
+    except ValueError as e:
+        logger.error(f"Google token verification failed: {str(e)}")
+        return Response(
+            {'error': 'Nieprawidłowy token Google'}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    except GoogleAuthError as e:
+        logger.error(f"Google auth error: {str(e)}")
+        return Response(
+            {'error': 'Błąd weryfikacji Google'}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    except Exception as e:
+        logger.error(f"Unexpected error in google_auth: {str(e)}")
+        return Response(
+            {'error': 'Wystąpił nieoczekiwany błąd'}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

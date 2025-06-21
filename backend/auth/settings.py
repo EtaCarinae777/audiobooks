@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os
 import stripe
+from decouple import config
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -62,6 +64,11 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173', #adress of your frontend
 ]
+CORS_ALLOW_CREDENTIALS = True
+# Google OAuth Settings
+GOOGLE_CLIENT_ID = config('GOOGLE_CLIENT_ID', default='')
+if not GOOGLE_CLIENT_ID:
+    raise ImproperlyConfigured('GOOGLE_CLIENT_ID environment variable is required')
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
@@ -168,5 +175,5 @@ ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp']
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-STRIPE_PUBLISHABLE_KEY = 'pk_test_51Rc0TcB3FY7gDqX2ZtUPWIrarMZYSZUGYKEN0rrbNKGGlLGdzvsSn9ohm104P6dDlhJSIP9kXnbpXFHAbrSOvygz00XSGxyKcn'
-STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
+STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY', default='')
+STRIPE_PUBLISHABLE_KEY = config('STRIPE_PUBLISHABLE_KEY', default='')
