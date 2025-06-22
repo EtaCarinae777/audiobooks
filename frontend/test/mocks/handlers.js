@@ -17,11 +17,31 @@ export const handlers = [
       );
     }
 
-    return res(
-      ctx.status(400),
-      ctx.json({ error: "Nieprawidłowy email lub hasło" })
-    );
-  }),
+      return res(
+        ctx.status(400),
+        ctx.json({ error: "Nieprawidłowy email lub hasło" })
+      );
+    }),
+    rest.get('/api/user/library', (req, res, ctx) => {
+      return res(
+        ctx.json([
+          {
+            id: 1,
+            title: 'Library Book 1',
+            author: 'Test Author',
+            narrator: 'Test Narrator',
+            duration: '5h 30m',
+            rating: 4.5,
+            is_favorite: true,
+            progress: 0.3,
+            chapters: [
+              { id: 1, title: 'Chapter 1', audio_file: '/test-audio.mp3' }
+            ]
+          }
+        ])
+      )
+    }),
+
 
   rest.post(`${BASE_URL}/register/`, (req, res, ctx) => {
     const { email, password } = req.body;

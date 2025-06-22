@@ -1,9 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { renderWithProviders, mockUnauthenticatedUser } from "../../test/utils";
+import {
+  renderWithProviders,
+  mockUnauthenticatedUser,
+} from "../../../test/utils";
 import Landing from "../Landing";
-
 // Mock useNavigate
 const mockNavigate = vi.fn();
 vi.mock("react-router-dom", async () => {

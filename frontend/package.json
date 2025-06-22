@@ -4,11 +4,16 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "test:all-safe": "vitest run --no-threads --reporter=verbose --pool=forks --poolOptions.forks.singleFork=true",
+    "test:groups": "npm run test:group1 && npm run test:group2 && npm run test:group3",
+    "test:group1": "vitest run src/components/__tests__/Register.test.jsx src/components/__tests__/Login.test.jsx --no-threads",
+    "test:group2": "vitest run src/components/__tests__/AudioPlayer.test.jsx src/components/__tests__/Home.test.jsx --no-threads",
+    "test:group3": "vitest run src/components/__tests__/Account.test.jsx src/components/__tests__/YourLibrary.test.jsx --no-threads",
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint .",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "test": "vitest --maxThreads=2",
+    "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage"
