@@ -8,7 +8,6 @@ from django.db import IntegrityError
 from datetime import date
 from decimal import Decimal
 
-# Import models from the main app
 from users.models import (
     Author, Category, Audiobook, Chapter, UserLibrary, 
     ListeningProgress, Rating, Purchase
@@ -18,7 +17,6 @@ User = get_user_model()
 
 
 class UserModelTest(TestCase):
-    """Test CustomUser model functionality"""
     
     def setUp(self):
         self.user_data = {
@@ -29,7 +27,6 @@ class UserModelTest(TestCase):
         }
     
     def test_create_user(self):
-        """Test creating a regular user"""
         user = User.objects.create_user(**self.user_data)
         self.assertEqual(user.email, 'test@example.com')
         self.assertTrue(user.check_password('testpassword123'))
@@ -38,27 +35,23 @@ class UserModelTest(TestCase):
         self.assertTrue(user.is_active)
     
     def test_create_superuser(self):
-        """Test creating a superuser"""
         superuser = User.objects.create_superuser(**self.user_data)
         self.assertEqual(superuser.email, 'test@example.com')
         self.assertTrue(superuser.is_staff)
         self.assertTrue(superuser.is_superuser)
     
     def test_email_required(self):
-        """Test that email is required"""
         with self.assertRaises(ValueError):
             User.objects.create_user(email='', password='testpassword123')
     
     def test_email_unique(self):
-        """Test that email must be unique"""
         User.objects.create_user(**self.user_data)
         with self.assertRaises(IntegrityError):
             User.objects.create_user(**self.user_data)
 
 
 class AudiobookModelTest(TestCase):
-    """Test audiobook-related models"""
-    
+
     def setUp(self):
         self.author = Author.objects.create(
             name="Test Author",
@@ -81,7 +74,6 @@ class AudiobookModelTest(TestCase):
         }
     
     def test_create_free_audiobook(self):
-        """Test creating a free audiobook"""
         audiobook = Audiobook.objects.create(**self.audiobook_data)
         self.assertEqual(audiobook.title, 'Test Audiobook')
         self.assertFalse(audiobook.is_premium)
@@ -89,7 +81,6 @@ class AudiobookModelTest(TestCase):
         self.assertIn("[FREE]", str(audiobook))
     
     def test_create_premium_audiobook(self):
-        """Test creating a premium audiobook"""
         self.audiobook_data.update({
             'is_premium': True,
             'price': Decimal('29.99')
@@ -100,7 +91,6 @@ class AudiobookModelTest(TestCase):
         self.assertIn("[PREMIUM", str(audiobook))
     
     def test_duration_formatted(self):
-        """Test audiobook duration formatting"""
         audiobook = Audiobook.objects.create(**self.audiobook_data)
         self.assertEqual(audiobook.duration_formatted, "2h 0m")
         
@@ -110,8 +100,7 @@ class AudiobookModelTest(TestCase):
 
 
 class UserInteractionModelTest(TestCase):
-    """Test user interaction models (library, progress, ratings, purchases)"""
-    
+
     def setUp(self):
         self.user = User.objects.create_user(
             email='interaction@example.com',
@@ -137,7 +126,6 @@ class UserInteractionModelTest(TestCase):
         )
     
     def test_user_library(self):
-        """Test user library functionality"""
         library_entry = UserLibrary.objects.create(
             user=self.user,
             audiobook=self.audiobook,
@@ -147,7 +135,6 @@ class UserInteractionModelTest(TestCase):
         self.assertIn(self.audiobook.title, str(library_entry))
     
     def test_listening_progress(self):
-        """Test listening progress tracking"""
         progress = ListeningProgress.objects.create(
             user=self.user,
             audiobook=self.audiobook,
@@ -158,7 +145,6 @@ class UserInteractionModelTest(TestCase):
         self.assertFalse(progress.is_completed)
     
     def test_rating_system(self):
-        """Test rating and review system"""
         rating = Rating.objects.create(
             user=self.user,
             audiobook=self.audiobook,
@@ -169,7 +155,6 @@ class UserInteractionModelTest(TestCase):
         self.assertIn("5/5", str(rating))
     
     def test_purchase_system(self):
-        """Test purchase tracking"""
         purchase = Purchase.objects.create(
             user=self.user,
             audiobook=self.audiobook,

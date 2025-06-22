@@ -5,23 +5,17 @@ from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from .utils import audiobook_cover_path, audiobook_audio_path, validate_audio_file, validate_image_file
 
-# Create your models here.
 class CustomUserManager(BaseUserManager):
-    """
-        Niestandardowy manager dla modelu CustomUser.
-        Odpowiada za tworzenie użytkowników i superużytkowników z email jako głównym identyfikatorem.
-    """
+
     def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError('The Email field must be set')
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
-        # Hashuje i ustawia hasło
         user.set_password(password)
         user.save(using = self._db)
         return user
-        
-    # Custom user model manager where email is the unique identifier    
+          
     def create_superuser(self, email, password=None, **extra_fields):
 
         extra_fields.setdefault('is_staff', True)
@@ -31,7 +25,7 @@ class CustomUserManager(BaseUserManager):
 
 
 
-# Create your models here.
+
 class CustomUser(AbstractUser):
     email = models.EmailField(max_length = 200, unique = True)
     birthday = models.DateField(null = True, blank = True)
@@ -82,8 +76,7 @@ class Audiobook(models.Model):
     publication_date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
     is_featured = models.BooleanField(default=False)
-    
-    # DODAJ TE POLA:
+
     is_premium = models.BooleanField(
         default=False, 
         verbose_name="Premium audiobook",
@@ -128,7 +121,7 @@ class Chapter(models.Model):
         return f"{self.audiobook.title} - Chapter {self.chapter_number}: {self.title}"
 
 class UserLibrary(models.Model):
-    """Biblioteka użytkownika - zakupione/dodane audiobooki"""
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='library')  # ← ZMIANA
     audiobook = models.ForeignKey(Audiobook, on_delete=models.CASCADE)
     added_at = models.DateTimeField(auto_now_add=True)
@@ -141,7 +134,6 @@ class UserLibrary(models.Model):
         return f"{self.user.username} - {self.audiobook.title}"
 
 class ListeningProgress(models.Model):
-    """Postęp słuchania dla każdego użytkownika"""
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # ← ZMIANA
     audiobook = models.ForeignKey(Audiobook, on_delete=models.CASCADE)
     current_chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE)
@@ -157,14 +149,11 @@ class ListeningProgress(models.Model):
     
     @property
     def progress_percentage(self):
-        """Oblicza procent ukończenia audiobooka"""
         total_seconds = sum(chapter.duration_seconds for chapter in self.audiobook.chapters.all())
         
-        # Sekundy z ukończonych rozdziałów
         completed_chapters = self.audiobook.chapters.filter(chapter_number__lt=self.current_chapter.chapter_number)
         completed_seconds = sum(chapter.duration_seconds for chapter in completed_chapters)
         
-        # Dodaj aktualną pozycję w bieżącym rozdziale
         current_seconds = completed_seconds + self.current_position_seconds
         
         if total_seconds > 0:
@@ -172,7 +161,7 @@ class ListeningProgress(models.Model):
         return 0
 
 class Rating(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # ← ZMIANA
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     audiobook = models.ForeignKey(Audiobook, on_delete=models.CASCADE, related_name='ratings')
     rating = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
     review = models.TextField(blank=True)
@@ -186,13 +175,11 @@ class Rating(models.Model):
     
 
 class Purchase(models.Model):
-    """Model przechowujący informacje o zakupionych audiobookach"""
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='purchases')
     audiobook = models.ForeignKey(Audiobook, on_delete=models.CASCADE, related_name='purchases')
     price_paid = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="Zapłacona cena")
     purchased_at = models.DateTimeField(auto_now_add=True)
     
-    # Pola dla integracji z płatnościami (później)
     payment_id = models.CharField(max_length=100, null=True, blank=True, help_text="ID płatności ze Stripe")
     payment_status = models.CharField(
         max_length=20,
@@ -202,11 +189,11 @@ class Purchase(models.Model):
             ('failed', 'Nieudana'),
             ('refunded', 'Zwrócona'),
         ],
-        default='completed'  # Na razie domyślnie completed
+        default='completed'
     )
     
     class Meta:
-        unique_together = ['user', 'audiobook']  # Jeden użytkownik nie może kupić tej samej książki dwa razy
+        unique_together = ['user', 'audiobook']
         verbose_name = "Purchase"
         verbose_name_plural = "Purchases"
     

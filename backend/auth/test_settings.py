@@ -65,7 +65,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'auth.wsgi.application'
 
-# Use in-memory SQLite for fastest tests
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -76,7 +75,6 @@ DATABASES = {
     }
 }
 
-# Disable migrations for faster test runs
 class DisableMigrations:
     def __contains__(self, item):
         return True
@@ -86,7 +84,6 @@ class DisableMigrations:
 
 MIGRATION_MODULES = DisableMigrations()
 
-# Password validation - simplified for tests
 AUTH_PASSWORD_VALIDATORS = []
 
 # Internationalization

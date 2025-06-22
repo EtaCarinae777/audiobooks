@@ -35,16 +35,13 @@ const AudiobookPage = () => {
   const [expandedDescription, setExpandedDescription] = useState(false);
   const [stripeDialog, setStripeDialog] = useState(false);
 
-  // Pobierz dane audiobooka
   const fetchAudiobookData = async () => {
     try {
       setLoading(true);
 
-      // Pobierz szczegóły audiobooka
       const audiobookRes = await AxiosInstance.get(`audiobooks/${id}/`);
       setAudiobook(audiobookRes.data);
 
-      // Pobierz rozdziały tylko jeśli użytkownik ma dostęp
       try {
         const chaptersRes = await AxiosInstance.get(
           `audiobooks/${id}/chapters/`
@@ -72,12 +69,10 @@ const AudiobookPage = () => {
     fetchAudiobookData();
   }, [id]);
 
-  // Funkcja otwierania Stripe
   const handlePurchase = () => {
     setStripeDialog(true);
   };
 
-  // Funkcja sukcesu płatności
   const handlePaymentSuccess = async (message) => {
     alert(message);
     await fetchAudiobookData();
@@ -102,7 +97,6 @@ const AudiobookPage = () => {
     }
   }, [chapters]);
 
-  // Odtwórz audiobook od pierwszego rozdziału
   const handlePlayAudiobook = () => {
     if (chapters.length === 0) {
       if (audiobook?.is_premium && !audiobook?.is_purchased) {
@@ -129,7 +123,6 @@ const AudiobookPage = () => {
     playTrack(firstChapter, playlist, 0);
   };
 
-  // Odtwórz konkretny rozdział
   const handlePlayChapter = (chapterIndex) => {
     const chapter = chapters[chapterIndex];
 
@@ -150,11 +143,9 @@ const AudiobookPage = () => {
     playTrack(chapterWithInfo, playlist, chapterIndex);
   };
 
-  // Sprawdź czy aktualnie grany jest ten audiobook
   const isCurrentAudiobook =
     currentTrack && currentTrack.audiobook_id === parseInt(id);
 
-  // Sprawdź czy użytkownik ma dostęp do tego audiobooka
   const hasAccess = !audiobook?.is_premium || audiobook?.is_purchased;
 
   if (loading) {
@@ -190,7 +181,6 @@ const AudiobookPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 text-white">
-      {/* Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl"></div>
@@ -198,7 +188,6 @@ const AudiobookPage = () => {
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Przycisk powrotu */}
         <button
           onClick={() => navigate(-1)}
           className="mb-6 flex items-center space-x-2 px-4 py-2 bg-white/10 border border-white/20 rounded-xl hover:bg-white/20 transition-all duration-300"
@@ -208,7 +197,6 @@ const AudiobookPage = () => {
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Lewa kolumna - Okładka i podstawowe info */}
           <div className="lg:col-span-1">
             <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 text-center">
               <img
@@ -217,7 +205,6 @@ const AudiobookPage = () => {
                 className="w-full max-w-sm mx-auto rounded-xl shadow-2xl mb-6"
               />
 
-              {/* Informacja o premium i cenie */}
               {audiobook.is_premium && (
                 <div className="mb-4">
                   <div
@@ -242,7 +229,6 @@ const AudiobookPage = () => {
                 </div>
               )}
 
-              {/* Przycisk zakupu lub odtwarzania */}
               {audiobook.is_premium && !audiobook.is_purchased ? (
                 <button
                   onClick={handlePurchase}
@@ -281,7 +267,6 @@ const AudiobookPage = () => {
                   : "Odtwórz audiobook"}
               </p>
 
-              {/* LibraryButton - tylko dla zakupionych lub darmowych */}
               {hasAccess && (
                 <LibraryButton
                   audiobook={audiobook}
@@ -293,9 +278,7 @@ const AudiobookPage = () => {
             </div>
           </div>
 
-          {/* Prawa kolumna - Szczegóły */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Informacje o audiobooku */}
             <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8">
               <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-purple-400 to-emerald-400 bg-clip-text text-transparent">
                 {audiobook.title}
@@ -392,7 +375,6 @@ const AudiobookPage = () => {
               )}
             </div>
 
-            {/* Lista rozdziałów */}
             <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8">
               <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
                 <BookOpen className="w-6 h-6 mr-3 text-blue-400" />
@@ -472,7 +454,6 @@ const AudiobookPage = () => {
         </div>
       </div>
 
-      {/* Real Stripe Payment Dialog */}
       <RealStripePayment
         open={stripeDialog}
         onClose={() => setStripeDialog(false)}

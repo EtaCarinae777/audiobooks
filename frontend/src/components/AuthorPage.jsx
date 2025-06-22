@@ -31,23 +31,19 @@ const AuthorPage = () => {
   const [error, setError] = useState(null);
   const [expandedBio, setExpandedBio] = useState(false);
 
-  // Pobierz dane autora i jego audiobooki
   const fetchAuthorData = async () => {
     try {
       setLoading(true);
 
-      // Pobierz dane autora
       const authorRes = await AxiosInstance.get(`authors/${id}/`);
       setAuthor(authorRes.data);
 
-      // Pobierz audiobooki autora
       const audiobooksRes = await AxiosInstance.get(
         `authors/${id}/audiobooks/`
       );
       setAudiobooks(audiobooksRes.data);
       setFilteredAudiobooks(audiobooksRes.data);
 
-      // Wyodrębnij unikalne kategorie z audiobooków
       const uniqueCategories = [
         ...new Set(
           audiobooksRes.data.map((book) => book.category_name).filter(Boolean)
@@ -62,18 +58,15 @@ const AuthorPage = () => {
     }
   };
 
-  // Filtrowanie audiobooków
   useEffect(() => {
     let filtered = audiobooks;
 
-    // Filtrowanie po kategorii
     if (selectedCategory !== "all") {
       filtered = filtered.filter(
         (book) => book.category_name === selectedCategory
       );
     }
 
-    // Filtrowanie po wyszukiwaniu
     if (searchQuery.trim()) {
       filtered = filtered.filter(
         (book) =>
@@ -89,12 +82,10 @@ const AuthorPage = () => {
     fetchAuthorData();
   }, [id]);
 
-  // Wyczyść wyszukiwanie
   const clearSearch = () => {
     setSearchQuery("");
   };
 
-  // Przejdź do audiobooka
   const goToAudiobook = (audiobookId) => {
     navigate(`/audiobook/${audiobookId}`);
   };
@@ -132,7 +123,6 @@ const AuthorPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 text-white">
-      {/* Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl"></div>
@@ -140,7 +130,6 @@ const AuthorPage = () => {
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        {/* Przycisk powrotu */}
         <button
           onClick={() => navigate(-1)}
           className="flex items-center space-x-2 px-4 py-2 bg-white/10 border border-white/20 rounded-xl hover:bg-white/20 transition-all duration-300"
@@ -149,7 +138,6 @@ const AuthorPage = () => {
           <span>Powrót</span>
         </button>
 
-        {/* Sekcja z informacjami o autorze */}
         <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8">
           <div className="flex flex-col lg:flex-row items-start lg:items-center space-y-6 lg:space-y-0 lg:space-x-8">
             <div className="w-32 h-32 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center text-4xl font-bold text-white shadow-2xl">
@@ -207,7 +195,6 @@ const AuthorPage = () => {
           </div>
         </div>
 
-        {/* Sekcja wyszukiwania i filtrowania */}
         <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
           <div className="flex flex-col lg:flex-row gap-4 mb-6">
             <div className="flex-1 relative">
@@ -232,7 +219,6 @@ const AuthorPage = () => {
             </div>
           </div>
 
-          {/* Filtry kategorii */}
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setSelectedCategory("all")}
@@ -260,7 +246,6 @@ const AuthorPage = () => {
           </div>
         </div>
 
-        {/* Wyniki wyszukiwania */}
         <div className="flex items-center space-x-3 mb-6">
           <BookOpen className="w-6 h-6 text-blue-400" />
           <h2 className="text-2xl font-bold text-white">
@@ -270,7 +255,6 @@ const AuthorPage = () => {
           </h2>
         </div>
 
-        {/* Lista audiobooków */}
         {filteredAudiobooks.length === 0 ? (
           <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-12 text-center">
             <BookOpen className="w-16 h-16 text-white/30 mx-auto mb-4" />
@@ -296,7 +280,6 @@ const AuthorPage = () => {
                     className="w-full h-48 object-cover"
                   />
 
-                  {/* Play overlay */}
                   <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <button className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center hover:scale-110 transition-transform">
                       <Play className="w-6 h-6 text-white ml-1" />

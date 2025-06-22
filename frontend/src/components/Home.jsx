@@ -35,7 +35,6 @@ const Home = () => {
   const [selectedAudiobookForPayment, setSelectedAudiobookForPayment] =
     useState(null);
 
-  // Pobierz dane
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -47,7 +46,6 @@ const Home = () => {
       setAudiobooks(audiobooksRes.data);
       setAuthors(authorsRes.data);
 
-      // Automatycznie wybierz pierwszy audiobook do carousel
       if (audiobooksRes.data.length > 0) {
         selectAudiobook(audiobooksRes.data[0]);
       }
@@ -59,7 +57,6 @@ const Home = () => {
     }
   };
 
-  // Pobierz rozdziały dla wybranego audiobooka
   const selectAudiobook = async (audiobook) => {
     try {
       setChaptersLoading(true);
@@ -72,10 +69,10 @@ const Home = () => {
         );
         setChapters(response.data);
       } catch (chaptersError) {
-        console.log("Chapters error:", chaptersError); // DEBUG
+        console.log("Chapters error:", chaptersError);
         if (chaptersError.response?.status === 403) {
-          // Brak dostępu do rozdziałów - prawdopodobnie premium
-          console.log("403 - brak dostępu do rozdziałów"); // DEBUG
+ 
+          console.log("403 - brak dostępu do rozdziałów"); 
           setChapters([]);
         } else {
           console.error("Inny błąd przy pobieraniu rozdziałów:", chaptersError);
@@ -90,21 +87,19 @@ const Home = () => {
     }
   };
 
-  // Następny rozdział
   const nextChapter = () => {
     if (currentChapterIndex < chapters.length - 1) {
       setCurrentChapterIndex(currentChapterIndex + 1);
     }
   };
 
-  // Poprzedni rozdział
   const prevChapter = () => {
     if (currentChapterIndex > 0) {
       setCurrentChapterIndex(currentChapterIndex - 1);
     }
   };
 
-  // Funkcja zakupu audiobooka
+
   const handleQuickPurchase = (audiobook, event) => {
     event.stopPropagation();
     setSelectedAudiobookForPayment(audiobook);
@@ -113,9 +108,8 @@ const Home = () => {
 
   const handlePaymentSuccess = async (message) => {
     alert(message);
-    await fetchData(); // Odśwież dane
+    await fetchData();
 
-    // Jeśli to jest wybrany audiobook, odśwież jego rozdziały
     if (
       selectedAudiobook &&
       selectedAudiobook.id === selectedAudiobookForPayment.id
@@ -127,7 +121,6 @@ const Home = () => {
     setSelectedAudiobookForPayment(null);
   };
 
-  // Przejdź do strony autora
   const goToAuthorPage = (authorId) => {
     navigate(`/author/${authorId}`);
   };
@@ -136,14 +129,13 @@ const Home = () => {
     navigate(`/audiobook/${audiobookId}`);
   };
 
-  // Sprawdź czy użytkownik ma dostęp do audiobooka
   const hasAccess = (audiobook) => {
     return !audiobook.is_premium || audiobook.is_purchased;
   };
 
   useEffect(() => {
     fetchData();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   if (loading) {
     return (
@@ -168,7 +160,6 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 text-white">
-      {/* Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl"></div>
@@ -176,7 +167,6 @@ const Home = () => {
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16">
-        {/* Sekcja 1: Audiobooki */}
         <section className="space-y-8">
           <div className="flex items-center space-x-3">
             <BookOpen className="w-8 h-8 text-blue-400" />
@@ -207,7 +197,7 @@ const Home = () => {
                       className="w-full h-48 object-cover"
                     />
 
-                    {/* Premium badge */}
+
                     {audiobook.is_premium && (
                       <div
                         className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1 ${
@@ -230,7 +220,6 @@ const Home = () => {
                       </div>
                     )}
 
-                    {/* Play overlay */}
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <button
                         className={`w-16 h-16 rounded-full flex items-center justify-center transition-transform hover:scale-110 ${
@@ -284,7 +273,6 @@ const Home = () => {
                       </div>
                     )}
 
-                    {/* Action Button */}
                     {audiobook.is_premium && !audiobook.is_purchased ? (
                       <button
                         onClick={(e) => handleQuickPurchase(audiobook, e)}
@@ -310,10 +298,8 @@ const Home = () => {
           )}
         </section>
 
-        {/* Divider */}
         <div className="w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
 
-        {/* Sekcja 2: Autorzy */}
         <section className="space-y-8">
           <div className="flex items-center space-x-3">
             <User className="w-8 h-8 text-purple-400" />
@@ -361,10 +347,8 @@ const Home = () => {
           )}
         </section>
 
-        {/* Divider */}
         <div className="w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
 
-        {/* Sekcja 3: Carousel rozdziałów */}
         {selectedAudiobook && (
           <section className="space-y-8">
             <div className="flex items-center space-x-3">
@@ -425,7 +409,6 @@ const Home = () => {
               </div>
             ) : (
               <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 space-y-8">
-                {/* Aktualny rozdział */}
                 <div className="text-center space-y-4">
                   <h3 className="text-2xl font-bold text-white">
                     Rozdział {chapters[currentChapterIndex]?.chapter_number}
@@ -441,7 +424,6 @@ const Home = () => {
                   </div>
                 </div>
 
-                {/* Kontrolki */}
                 <div className="flex items-center justify-center space-x-6">
                   <button
                     onClick={prevChapter}
@@ -464,14 +446,13 @@ const Home = () => {
                   </button>
                 </div>
 
-                {/* Progress */}
                 <div className="text-center">
                   <p className="text-white/60">
                     {currentChapterIndex + 1} z {chapters.length} rozdziałów
                   </p>
                 </div>
 
-                {/* Miniaturki rozdziałów */}
+
                 <div className="flex flex-wrap gap-2 justify-center max-h-32 overflow-y-auto p-2">
                   {chapters.map((chapter, index) => (
                     <button
@@ -488,7 +469,6 @@ const Home = () => {
                   ))}
                 </div>
 
-                {/* Przycisk biblioteka */}
                 <div className="text-center">
                   <LibraryButton
                     audiobook={selectedAudiobook}
@@ -502,7 +482,6 @@ const Home = () => {
         )}
       </div>
 
-      {/* Payment Modal */}
       {selectedAudiobookForPayment && (
         <RealStripePayment
           open={stripeDialog}

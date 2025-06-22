@@ -24,7 +24,6 @@ const Login = () => {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  // Normalne logowanie
   const submission = async (data) => {
     setLoading(true);
     setError("");
@@ -52,13 +51,11 @@ const Login = () => {
     }
   };
 
-  // Logowanie przez Google - ZMIEŃ ENDPOINT:
   const handleGoogleSuccess = async (credentialResponse) => {
     setLoading(true);
     setError("");
 
     try {
-      // ZMIEŃ NA TWÓJ ENDPOINT:
       const response = await AxiosInstance.post("auth/google/", {
         token: credentialResponse.credential,
       });
@@ -80,14 +77,12 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 text-white flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background Elements - jak wcześniej */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"></div>
       </div>
 
-      {/* Przycisk powrotu */}
       <button
         onClick={() => navigate("/")}
         className="absolute top-5 left-5 p-3 bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl hover:bg-white/20 hover:scale-110 transition-all duration-300 z-10 group"
@@ -100,7 +95,6 @@ const Login = () => {
         className="relative z-10 w-full max-w-md"
       >
         <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl hover:bg-white/15 transition-all duration-500 space-y-6">
-          {/* Header */}
           <div className="text-center space-y-4">
             <div className="flex items-center justify-center space-x-3">
               <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
@@ -116,7 +110,6 @@ const Login = () => {
             </p>
           </div>
 
-          {/* Error Alert */}
           {error && (
             <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex items-center space-x-3">
               <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
@@ -124,7 +117,6 @@ const Login = () => {
             </div>
           )}
 
-          {/* Google Login Button */}
           <div className="space-y-4">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
@@ -162,7 +154,6 @@ const Login = () => {
             </div>
           </div>
 
-          {/* Email Field */}
           <div className="space-y-2">
             <label
               htmlFor="email"
@@ -195,7 +186,6 @@ const Login = () => {
             )}
           </div>
 
-          {/* Password Field */}
           <div className="space-y-2">
             <label
               htmlFor="password"
@@ -241,7 +231,6 @@ const Login = () => {
             )}
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}
@@ -257,7 +246,6 @@ const Login = () => {
             )}
           </button>
 
-          {/* Links */}
           <div className="space-y-4 text-center">
             <Link
               to="/register"
@@ -276,7 +264,6 @@ const Login = () => {
           </div>
         </div>
 
-        {/* Additional Info */}
         <div className="text-center mt-6">
           <p className="text-white/50 text-sm">
             Bezpieczne logowanie z pełnym szyfrowaniem danych

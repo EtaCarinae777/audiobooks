@@ -11,7 +11,6 @@ import {
 const Account = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 text-white">
-      {/* Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl"></div>
@@ -19,7 +18,6 @@ const Account = () => {
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        {/* Header */}
         <div className="text-center space-y-4">
           <div className="flex items-center justify-center space-x-3">
             <User className="w-8 h-8 text-blue-400" />
@@ -81,7 +79,6 @@ const Account = () => {
           </button>
         </div>
 
-        {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300 hover:scale-105 cursor-pointer">
             <div className="flex items-center space-x-4">
@@ -124,7 +121,6 @@ const Account = () => {
           </div>
         </div>
 
-        {/* Security Section */}
         <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8">
           <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
             <Shield className="w-6 h-6 mr-3 text-emerald-400" />
@@ -164,7 +160,6 @@ const Account = () => {
           </div>
         </div>
 
-        {/* Help Section */}
         <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8">
           <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
             <HelpCircle className="w-6 h-6 mr-3 text-purple-400" />

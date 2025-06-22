@@ -1,26 +1,17 @@
 #!/usr/bin/env python3
-"""
-Organized test runner for the audiobook project
-Usage: python tests/run_tests.py [test_category]
-"""
 import os
 import sys
 import subprocess
 import argparse
 
-# Add the backend directory to Python path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def run_tests(test_category=None, coverage=False, verbose=False):
-    """Run tests with specified parameters"""
-    
-    # Set Django settings
+
     os.environ['DJANGO_SETTINGS_MODULE'] = 'auth.test_settings'
-    
-    # Base command
+
     cmd = ['python', 'manage.py', 'test']
-    
-    # Test selection
+
     if test_category:
         test_modules = {
             'models': 'tests.test_models',
@@ -36,18 +27,15 @@ def run_tests(test_category=None, coverage=False, verbose=False):
             print(f"Available categories: {list(test_modules.keys())}")
             return False
     else:
-        cmd.append('tests')  # Run all tests in tests package
+        cmd.append('tests')
     
-    # Add settings
     cmd.extend(['--settings=auth.test_settings'])
     
-    # Verbosity
     if verbose:
         cmd.extend(['--verbosity=2'])
     else:
         cmd.extend(['--verbosity=1'])
     
-    # Coverage wrapper
     if coverage:
         cmd = ['coverage', 'run', '--source=.'] + cmd[1:]
     
@@ -75,7 +63,6 @@ def run_tests(test_category=None, coverage=False, verbose=False):
         return False
 
 def main():
-    """Main function"""
     parser = argparse.ArgumentParser(description='Run audiobook project tests')
     parser.add_argument(
         'category', 

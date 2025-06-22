@@ -35,7 +35,6 @@ const AudioPlayer = ({
   const [volume, setVolume] = useState(1);
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
 
-  // Formatowanie czasu
   const formatTime = (seconds) => {
     if (!seconds || isNaN(seconds)) return "0:00";
     const mins = Math.floor(seconds / 60);
@@ -43,7 +42,6 @@ const AudioPlayer = ({
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  // Aktualizuj czas odtwarzania
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -70,7 +68,6 @@ const AudioPlayer = ({
     };
   }, [onNext, onProgressUpdate]);
 
-  // Kontrola odtwarzania
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -82,7 +79,6 @@ const AudioPlayer = ({
     }
   }, [isPlaying]);
 
-  // Zmiana ścieżki
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !currentTrack) return;
@@ -95,7 +91,6 @@ const AudioPlayer = ({
     }
   }, [currentTrack, isPlaying]);
 
-  // Przewijanie
   const handleSeek = (event, newValue) => {
     const audio = audioRef.current;
     if (audio) {
@@ -104,7 +99,6 @@ const AudioPlayer = ({
     }
   };
 
-  // Cofnij 10s
   const handleReplay = () => {
     const audio = audioRef.current;
     if (audio) {
@@ -112,7 +106,6 @@ const AudioPlayer = ({
     }
   };
 
-  // Przewiń 30s
   const handleForward = () => {
     const audio = audioRef.current;
     if (audio) {
@@ -120,7 +113,6 @@ const AudioPlayer = ({
     }
   };
 
-  // Zmiana głośności
   const handleVolumeChange = (event, newValue) => {
     setVolume(newValue);
     if (audioRef.current) {
@@ -146,7 +138,6 @@ const AudioPlayer = ({
         color: "white",
       }}
     >
-      {/* Audio element */}
       <audio
         ref={audioRef}
         preload="metadata"
@@ -154,7 +145,6 @@ const AudioPlayer = ({
       />
 
       <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-        {/* Informacje o ścieżce */}
         <Box
           sx={{
             display: "flex",
@@ -195,7 +185,6 @@ const AudioPlayer = ({
           </Box>
         </Box>
 
-        {/* Kontrolki odtwarzania */}
         <Box
           sx={{
             display: "flex",
@@ -243,7 +232,6 @@ const AudioPlayer = ({
           </IconButton>
         </Box>
 
-        {/* Pasek postępu i czas */}
         <Box
           sx={{ flex: 1, display: "flex", alignItems: "center", gap: 2, mx: 2 }}
         >
@@ -281,7 +269,6 @@ const AudioPlayer = ({
           </Typography>
         </Box>
 
-        {/* Kontrolki głośności */}
         <Box
           sx={{
             display: "flex",
@@ -323,7 +310,6 @@ const AudioPlayer = ({
           )}
         </Box>
 
-        {/* Przycisk zamknij */}
         <IconButton
           onClick={onClose}
           sx={{ color: "rgba(255, 255, 255, 0.7)" }}
