@@ -8,3 +8,6 @@ packaging==25.0
 pillow==11.2.1
 sqlparse==0.5.3
 tzdata==2025.2
+python-dotenv==1.1.0
+stripe==1.2.0
+whitenoise==6.4.0

@@ -40,7 +40,7 @@ class LoginViewset(viewsets.ViewSet):
                 #'_, - crate tuple  
                 _, token = AuthToken.objects.create(user)
                 return Response({
-                    "user": self.serializer_class(user).data,
+                    "user": UserSerializer(user).data,
                     "token": token
 
                 }

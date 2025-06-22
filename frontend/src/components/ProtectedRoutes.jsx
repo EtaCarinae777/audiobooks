@@ -2,24 +2,21 @@ import { Outlet, Navigate } from "react-router-dom";
 
 const ProtectedRoutes = () => {
   const token = localStorage.getItem("Token");
-<<<<<<< HEAD
+  
+  // Knox tokeny to proste stringi, nie JWT
+  // Sprawdzamy tylko czy token istnieje i jest poprawny
   const isTokenValid = (token) => {
     if (!token) return false;
-
-    try {
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      return payload.exp * 1000 > Date.now();
-    } catch {
-      return false;
-    }
+    if (token === "undefined" || token === "null") return false;
+    if (token.trim() === "") return false;
+    
+    // Knox tokeny mają zwykle długość 40+ znaków
+    if (token.length < 20) return false;
+    
+    return true;
   };
+  
   return token && isTokenValid(token) ? <Outlet /> : <Navigate to="/login" />;
 };
 
-=======
-  // dodac sprawdzenie czy token jest wazny
-
-  return token ? <Outlet /> : <Navigate to="/" />;
-};
->>>>>>> ec13e8455441e0e5e285a45b95017b1698d6ae71
 export default ProtectedRoutes;

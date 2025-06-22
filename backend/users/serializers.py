@@ -36,6 +36,11 @@ class UserAccountSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'email', 'date_joined', 'plan_display_name']
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'first_name', 'last_name', 'username']
+
 class AuthorSerializer(serializers.ModelSerializer):
     audiobooks_count = serializers.SerializerMethodField()
     
