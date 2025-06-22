@@ -1,552 +1,500 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import AxiosInstance from './AxiosInstance';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import AxiosInstance from "./AxiosInstance";
 import {
-    Box,
-    Card,
-    CardContent,
-    CardMedia,
-    Typography,
-    Grid,
-    Chip,
-    Button,
-    CircularProgress,
-    Alert,
-    Rating,
-    IconButton,
-    Tooltip,
-    Avatar,
-    Paper,
-    Divider
-} from '@mui/material';
-import {
-    PlayArrow,
-    Favorite,
-    FavoriteBorder,
-    LibraryAdd,
-    LibraryAddCheck,
-    Person,
-    MenuBook,
-    SkipNext,
-    SkipPrevious,
-    PlayCircle,
-    AccessTime,
-    Lock,
-    CheckCircle,
-    ShoppingCart
-} from '@mui/icons-material';
-import LibraryButton from './forms/LibraryButton';  
-import RealStripePayment from './RealStripePayment';
+  Play,
+  Heart,
+  Plus,
+  Check,
+  User,
+  BookOpen,
+  SkipForward,
+  SkipBack,
+  PlayCircle,
+  Clock,
+  Lock,
+  CheckCircle,
+  ShoppingCart,
+  Star,
+  Loader,
+} from "lucide-react";
+import LibraryButton from "./forms/LibraryButton";
+import RealStripePayment from "./RealStripePayment";
 
 const Home = () => {
-    const navigate = useNavigate();
-    const [audiobooks, setAudiobooks] = useState([]);
-    const [authors, setAuthors] = useState([]);
-    const [selectedAudiobook, setSelectedAudiobook] = useState(null);
-    const [chapters, setChapters] = useState([]);
-    const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
-    const [loading, setLoading] = useState(true);
-    const [chaptersLoading, setChaptersLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [stripeDialog, setStripeDialog] = useState(false);
-const [selectedAudiobookForPayment, setSelectedAudiobookForPayment] = useState(null);
+  const navigate = useNavigate();
+  const [audiobooks, setAudiobooks] = useState([]);
+  const [authors, setAuthors] = useState([]);
+  const [selectedAudiobook, setSelectedAudiobook] = useState(null);
+  const [chapters, setChapters] = useState([]);
+  const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [chaptersLoading, setChaptersLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [stripeDialog, setStripeDialog] = useState(false);
+  const [selectedAudiobookForPayment, setSelectedAudiobookForPayment] =
+    useState(null);
 
-    // Pobierz dane
-    const fetchData = async () => {
-        try {
-            setLoading(true);
-            const [audiobooksRes, authorsRes] = await Promise.all([
-                AxiosInstance.get('audiobooks/'),
-                AxiosInstance.get('authors/')
-            ]);
-            
-            setAudiobooks(audiobooksRes.data);
-            setAuthors(authorsRes.data);
-            
-            // Automatycznie wybierz pierwszy audiobook do carousel
-            if (audiobooksRes.data.length > 0) {
-                selectAudiobook(audiobooksRes.data[0]);
-            }
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            setError('Nie udało się pobrać danych');
-        } finally {
-            setLoading(false);
-        }
-    };
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const [audiobooksRes, authorsRes] = await Promise.all([
+        AxiosInstance.get("audiobooks/"),
+        AxiosInstance.get("authors/"),
+      ]);
 
-    // Pobierz rozdziały dla wybranego audiobooka
-    const selectAudiobook = async (audiobook) => {
-        try {
-            setChaptersLoading(true);
-            setSelectedAudiobook(audiobook);
-            setCurrentChapterIndex(0);
-            
-            try {
-                const response = await AxiosInstance.get(`audiobooks/${audiobook.id}/chapters/`);
-                setChapters(response.data);
-            } catch (chaptersError) {
-                console.log('Chapters error:', chaptersError); // DEBUG
-                if (chaptersError.response?.status === 403) {
-                    // Brak dostępu do rozdziałów - prawdopodobnie premium
-                    console.log('403 - brak dostępu do rozdziałów'); // DEBUG
-                    setChapters([]);
-                } else {
-                    console.error('Inny błąd przy pobieraniu rozdziałów:', chaptersError);
-                    setChapters([]);
-                }
-            }
-        } catch (error) {
-            console.error('Error fetching chapters:', error);
-            setChapters([]);
-        } finally {
-            setChaptersLoading(false);
-        }
-    };
-    
-    // Następny rozdział
-    const nextChapter = () => {
-        if (currentChapterIndex < chapters.length - 1) {
-            setCurrentChapterIndex(currentChapterIndex + 1);
-        }
-    };
+      setAudiobooks(audiobooksRes.data);
+      setAuthors(authorsRes.data);
 
-    // Poprzedni rozdział
-    const prevChapter = () => {
-        if (currentChapterIndex > 0) {
-            setCurrentChapterIndex(currentChapterIndex - 1);
-        }
-    };
+      if (audiobooksRes.data.length > 0) {
+        selectAudiobook(audiobooksRes.data[0]);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setError("Nie udało się pobrać danych");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    // Funkcja zakupu audiobooka
-    const handleQuickPurchase = (audiobook, event) => {
-        event.stopPropagation();
-        setSelectedAudiobookForPayment(audiobook);
-        setStripeDialog(true);
-    };
+  const selectAudiobook = async (audiobook) => {
+    try {
+      setChaptersLoading(true);
+      setSelectedAudiobook(audiobook);
+      setCurrentChapterIndex(0);
 
-    const handlePaymentSuccess = async (message) => {
-        alert(message);
-        await fetchData(); // Odśwież dane
-        
-        // Jeśli to jest wybrany audiobook, odśwież jego rozdziały
-        if (selectedAudiobook && selectedAudiobook.id === selectedAudiobookForPayment.id) {
-            await selectAudiobook(selectedAudiobookForPayment);
-        }
-        
-        setStripeDialog(false);
-        setSelectedAudiobookForPayment(null);
-    };
-
-    // Przejdź do strony autora
-    const goToAuthorPage = (authorId) => {
-        navigate(`/author/${authorId}`);
-    };
-
-    const goToAudiobookPage = (audiobookId) => {
-        navigate(`/audiobook/${audiobookId}`); 
-    };
-
-    // Sprawdź czy użytkownik ma dostęp do audiobooka
-    const hasAccess = (audiobook) => {
-        return !audiobook.is_premium || audiobook.is_purchased;
-    };
-
-    useEffect(() => {
-        fetchData();
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-    if (loading) {
-        return (
-            <div className="home-container">
-                <div className="loading-container">
-                    <CircularProgress size={60} sx={{ color: '#667eea' }} />
-                    <Typography className="loading-text">
-                        Ładowanie danych...
-                    </Typography>
-                </div>
-            </div>
+      try {
+        const response = await AxiosInstance.get(
+          `audiobooks/${audiobook.id}/chapters/`
         );
+        setChapters(response.data);
+      } catch (chaptersError) {
+        console.log("Chapters error:", chaptersError);
+        if (chaptersError.response?.status === 403) {
+ 
+          console.log("403 - brak dostępu do rozdziałów"); 
+          setChapters([]);
+        } else {
+          console.error("Inny błąd przy pobieraniu rozdziałów:", chaptersError);
+          setChapters([]);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching chapters:", error);
+      setChapters([]);
+    } finally {
+      setChaptersLoading(false);
+    }
+  };
+
+  const nextChapter = () => {
+    if (currentChapterIndex < chapters.length - 1) {
+      setCurrentChapterIndex(currentChapterIndex + 1);
+    }
+  };
+
+  const prevChapter = () => {
+    if (currentChapterIndex > 0) {
+      setCurrentChapterIndex(currentChapterIndex - 1);
+    }
+  };
+
+
+  const handleQuickPurchase = (audiobook, event) => {
+    event.stopPropagation();
+    setSelectedAudiobookForPayment(audiobook);
+    setStripeDialog(true);
+  };
+
+  const handlePaymentSuccess = async (message) => {
+    alert(message);
+    await fetchData();
+
+    if (
+      selectedAudiobook &&
+      selectedAudiobook.id === selectedAudiobookForPayment.id
+    ) {
+      await selectAudiobook(selectedAudiobookForPayment);
     }
 
-    if (error) {
-        return (
-            <div className="home-container">
-                <Alert severity="error" sx={{ background: 'rgba(244, 67, 54, 0.1)', color: 'white' }}>
-                    {error}
-                </Alert>
-            </div>
-        );
-    }
+    setStripeDialog(false);
+    setSelectedAudiobookForPayment(null);
+  };
 
+  const goToAuthorPage = (authorId) => {
+    navigate(`/author/${authorId}`);
+  };
+
+  const goToAudiobookPage = (audiobookId) => {
+    navigate(`/audiobook/${audiobookId}`);
+  };
+
+  const hasAccess = (audiobook) => {
+    return !audiobook.is_premium || audiobook.is_purchased;
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  if (loading) {
     return (
-        <div className="home-container">
-            {/* Sekcja 1: Audiobooki */}
-            <section>
-                <Typography className="home-section-title">
-                    <MenuBook sx={{ mr: 2, fontSize: '2.5rem', color: '#667eea' }} />
-                    Dostępne Audiobooki
-                </Typography>
-
-                {audiobooks.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '4rem 0' }}>
-                        <Typography variant="h6" sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>
-                            Brak dostępnych audiobooków
-                        </Typography>
-                    </div>
-                ) : (
-                    <div className="audiobooks-grid">
-                        {audiobooks.slice(0, 6).map((audiobook, index) => (
-                            <Card
-                                key={audiobook.id}
-                                className="audiobook-card"
-                                onClick={() => goToAudiobookPage(audiobook.id)} 
-                                style={{ animationDelay: `${index * 0.1}s` }}
-                            >
-                                <div className="card-content">
-                                    <div className="card-image">
-                                        <CardMedia
-                                            component="img"
-                                            height="200"
-                                            image={audiobook.cover_image || '/api/placeholder/280/200'}
-                                            alt={audiobook.title}
-                                            style={{ borderRadius: '12px' }}
-                                        />
-                                        
-                                        {/* Premium badge */}
-                                        {audiobook.is_premium && (
-                                            <Chip
-                                                icon={audiobook.is_purchased ? <CheckCircle /> : <Lock />}
-                                                label={audiobook.is_purchased ? 'ZAKUPIONE' : `${audiobook.price} PLN`}
-                                                sx={{
-                                                    position: 'absolute',
-                                                    top: 8,
-                                                    right: 8,
-                                                    background: audiobook.is_purchased 
-                                                        ? 'linear-gradient(135deg, #10b981, #059669)'
-                                                        : 'linear-gradient(135deg, #f59e0b, #d97706)',
-                                                    color: 'white',
-                                                    fontWeight: 'bold',
-                                                    fontSize: '0.75rem'
-                                                }}
-                                            />
-                                        )}
-                                        
-                                        {/* Play overlay */}
-                                        <div style={{
-                                            position: 'absolute',
-                                            top: 0,
-                                            left: 0,
-                                            right: 0,
-                                            bottom: 0,
-                                            background: 'rgba(0, 0, 0, 0.5)',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            opacity: 0,
-                                            transition: 'opacity 0.3s ease',
-                                            borderRadius: '12px'
-                                        }}
-                                        className="play-overlay"
-                                        >
-                                            <IconButton
-                                                sx={{
-                                                    background: hasAccess(audiobook) 
-                                                        ? 'linear-gradient(135deg, #667eea, #ec4899)'
-                                                        : 'rgba(156, 163, 175, 0.8)',
-                                                    color: 'white',
-                                                    width: 60,
-                                                    height: 60,
-                                                    '&:hover': {
-                                                        transform: hasAccess(audiobook) ? 'scale(1.1)' : 'none'
-                                                    }
-                                                }}
-                                                disabled={!hasAccess(audiobook)}
-                                            >
-                                                {hasAccess(audiobook) ? (
-                                                    <PlayArrow sx={{ fontSize: 30 }} />
-                                                ) : (
-                                                    <Lock sx={{ fontSize: 30 }} />
-                                                )}
-                                            </IconButton>
-                                        </div>
-                                    </div>
-
-                                    <Typography className="card-title">
-                                        {audiobook.title}
-                                    </Typography>
-                                    
-                                    <Typography className="card-author">
-                                        {audiobook.author_name}
-                                    </Typography>
-
-                                    <div className="card-meta">
-                                        <span>Czyta: {audiobook.narrator}</span>
-                                        {audiobook.duration_formatted && (
-                                            <span>{audiobook.duration_formatted}</span>
-                                        )}
-                                    </div>
-
-                                    {audiobook.average_rating && (
-                                        <div style={{ display: 'flex', alignItems: 'center', marginTop: '0.5rem' }}>
-                                            <Rating
-                                                value={audiobook.average_rating}
-                                                precision={0.1}
-                                                size="small"
-                                                readOnly
-                                                sx={{ '& .MuiRating-iconFilled': { color: '#fbbf24' } }}
-                                            />
-                                            <Typography sx={{ color: 'rgba(255, 255, 255, 0.6)', ml: 1, fontSize: '0.85rem' }}>
-                                                {audiobook.average_rating}
-                                            </Typography>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Przycisk akcji */}
-                                {audiobook.is_premium && !audiobook.is_purchased ? (
-                                    <Button
-                                        onClick={(e) => handleQuickPurchase(audiobook, e)}
-                                        startIcon={<ShoppingCart />}
-                                        sx={{
-                                            background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-                                            color: 'white',
-                                            margin: '0.5rem',
-                                            '&:hover': {
-                                                background: 'linear-gradient(135deg, #d97706, #b45309)'
-                                            }
-                                        }}
-                                        fullWidth
-                                    >
-                                        Kup za {audiobook.price} PLN
-                                    </Button>
-                                ) : (
-                                    <LibraryButton 
-                                        audiobook={audiobook} 
-                                        onStatusChange={fetchData} 
-                                        size="small" 
-                                        fullWidth 
-                                    />
-                                )}
-                            </Card>
-                        ))}
-                    </div>
-                )}
-            </section>
-
-            <hr className="section-divider" />
-
-            {/* Sekcja 2: Autorzy */}
-            <section>
-                <Typography className="home-section-title">
-                    <Person sx={{ mr: 2, fontSize: '2.5rem', color: '#ec4899' }} />
-                    Autorzy
-                </Typography>
-
-                {authors.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '4rem 0' }}>
-                        <Typography variant="h6" sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>
-                            Brak autorów
-                        </Typography>
-                    </div>
-                ) : (
-                    <div className="authors-grid">
-                        {authors.slice(0, 8).map((author, index) => (
-                            <Paper
-                                key={author.id}
-                                className="author-card"
-                                onClick={() => goToAuthorPage(author.id)}
-                                style={{ 
-                                    animationDelay: `${(index + 2) * 0.1}s`,
-                                    cursor: 'pointer',
-                                    transition: 'all 0.3s ease'
-                                }}
-                                sx={{
-                                    '&:hover': {
-                                        transform: 'translateY(-5px)',
-                                        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)'
-                                    }
-                                }}
-                            >
-                                <div className="author-info">
-                                    <Avatar className="author-avatar">
-                                        {author.name.charAt(0)}
-                                    </Avatar>
-                                    <div>
-                                        <Typography className="author-name">
-                                            {author.name}
-                                        </Typography>
-                                        <Typography className="author-count">
-                                            {author.audiobooks_count} audiobooków
-                                        </Typography>
-                                    </div>
-                                </div>
-                                {author.bio && (
-                                    <Typography className="author-bio">
-                                        {author.bio.length > 100 ? `${author.bio.substring(0, 100)}...` : author.bio}
-                                    </Typography>
-                                )}
-                            </Paper>
-                        ))}
-                    </div>
-                )}
-            </section>
-
-            <hr className="section-divider" />
-
-            {/* Sekcja 3: Carousel rozdziałów */}
-            {selectedAudiobook && (
-                <section>
-                <Box className="home-section-title" sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                    <PlayCircle sx={{ mr: 2, fontSize: '2.5rem', color: '#3b82f6' }} />
-                    <Typography variant="h4" component="span" sx={{ color: 'white', fontWeight: 'bold' }}>
-                        Rozdziały: {selectedAudiobook.title}
-                    </Typography>
-                    {selectedAudiobook.is_premium && (
-                        <Chip
-                            icon={selectedAudiobook.is_purchased ? <CheckCircle /> : <Lock />}
-                            label={selectedAudiobook.is_purchased ? 'ZAKUPIONE' : 'PREMIUM'}
-                            sx={{
-                                ml: 2,
-                                background: selectedAudiobook.is_purchased 
-                                    ? 'linear-gradient(135deg, #10b981, #059669)'
-                                    : 'linear-gradient(135deg, #f59e0b, #d97706)',
-                                color: 'white',
-                                fontWeight: 'bold'
-                            }}
-                        />
-                    )}
-                </Box>
-                    {chaptersLoading ? (
-                        <div className="loading-container">
-                            <CircularProgress size={40} sx={{ color: '#667eea' }} />
-                        </div>
-                    ) : !hasAccess(selectedAudiobook) ? (
-                        <Paper className="chapter-carousel">
-                            <div style={{ 
-                                textAlign: 'center', 
-                                padding: '4rem 2rem',
-                                background: 'rgba(245, 158, 11, 0.1)',
-                                borderRadius: '15px',
-                                border: '2px solid rgba(245, 158, 11, 0.3)'
-                            }}>
-                                <Lock sx={{ fontSize: 64, color: 'rgba(245, 158, 11, 0.8)', mb: 2 }} />
-                                <Typography variant="h5" sx={{ color: 'white', mb: 2, fontWeight: 'bold' }}>
-                                    Audiobook Premium
-                                </Typography>
-                                <Typography sx={{ color: 'rgba(255, 255, 255, 0.8)', mb: 3, fontSize: '1.1rem' }}>
-                                    Ten audiobook jest dostępny w wersji premium za {selectedAudiobook.price} PLN
-                                </Typography>
-                                <Button
-                                    onClick={(e) => handleQuickPurchase(selectedAudiobook, e)}
-                                    startIcon={<ShoppingCart />}
-                                    variant="contained"
-                                    sx={{
-                                        background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-                                        color: 'white',
-                                        fontSize: '1.1rem',
-                                        fontWeight: 'bold',
-                                        px: 4,
-                                        py: 1.5,
-                                        '&:hover': {
-                                            background: 'linear-gradient(135deg, #d97706, #b45309)',
-                                            transform: 'scale(1.05)'
-                                        }
-                                    }}
-                                >
-                                    Kup za {selectedAudiobook.price} PLN
-                                </Button>
-                            </div>
-                        </Paper>
-                    ) : chapters.length === 0 ? (
-                        <div style={{ textAlign: 'center', padding: '4rem 0' }}>
-                            <Typography variant="h6" sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>
-                                Brak rozdziałów dla tego audiobooka
-                            </Typography>
-                        </div>
-                    ) : (
-                        <Paper className="chapter-carousel">
-                            {/* Aktualny rozdział */}
-                            <div className="chapter-header">
-                                <Typography className="chapter-title">
-                                    Rozdział {chapters[currentChapterIndex]?.chapter_number}
-                                </Typography>
-                                <Typography className="chapter-subtitle">
-                                    {chapters[currentChapterIndex]?.title}
-                                </Typography>
-                                <div className="chapter-duration">
-                                    <AccessTime sx={{ fontSize: '1rem' }} />
-                                    <span>{chapters[currentChapterIndex]?.duration_formatted}</span>
-                                </div>
-                            </div>
-
-                            {/* Kontrolki */}
-                            <div className="chapter-controls">
-                                <IconButton
-                                    onClick={prevChapter}
-                                    disabled={currentChapterIndex === 0}
-                                    className="chapter-control-btn"
-                                >
-                                    <SkipPrevious />
-                                </IconButton>
-
-                                <IconButton className="main-play-btn">
-                                    <PlayArrow sx={{ fontSize: 40 }} />
-                                </IconButton>
-
-                                <IconButton
-                                    onClick={nextChapter}
-                                    disabled={currentChapterIndex === chapters.length - 1}
-                                    className="chapter-control-btn"
-                                >
-                                    <SkipNext />
-                                </IconButton>
-                            </div>
-
-                            {/* Progress */}
-                            <div className="chapter-progress">
-                                <Typography className="chapter-progress-text">
-                                    {currentChapterIndex + 1} z {chapters.length} rozdziałów
-                                </Typography>
-                            </div>
-
-                            {/* Miniaturki rozdziałów */}
-                            <div className="chapter-chips">
-                                {chapters.map((chapter, index) => (
-                                    <Chip
-                                        key={chapter.id}
-                                        label={chapter.chapter_number}
-                                        onClick={() => setCurrentChapterIndex(index)}
-                                        className={`chapter-chip ${index === currentChapterIndex ? 'active' : ''}`}
-                                    />
-                                ))}
-                            </div>
-
-                            {/* Przycisk biblioteka */}
-                            <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-                                <LibraryButton 
-                                    audiobook={selectedAudiobook}
-                                    onStatusChange={fetchData}
-                                    style={{ minWidth: '200px' }}
-                                />
-                            </div>
-                        </Paper>
-                    )}
-                </section>
-            )}
-            {selectedAudiobookForPayment && (
-                <RealStripePayment
-                    open={stripeDialog}
-                    onClose={() => {
-                        setStripeDialog(false);
-                        setSelectedAudiobookForPayment(null);
-                    }}
-                    audiobook={selectedAudiobookForPayment}
-                    onSuccess={handlePaymentSuccess}
-                />
-            )}
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 text-white flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Loader className="w-16 h-16 animate-spin text-blue-400 mx-auto" />
+          <p className="text-xl text-white/80">Ładowanie danych...</p>
         </div>
+      </div>
     );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 text-white flex items-center justify-center p-4">
+        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6 max-w-md">
+          <p className="text-red-300">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 text-white">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl"></div>
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16">
+        <section className="space-y-8">
+          <div className="flex items-center space-x-3">
+            <BookOpen className="w-8 h-8 text-blue-400" />
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-emerald-400 bg-clip-text text-transparent">
+              Dostępne Audiobooki
+            </h2>
+          </div>
+
+          {audiobooks.length === 0 ? (
+            <div className="text-center py-16">
+              <p className="text-xl text-white/60">
+                Brak dostępnych audiobooków
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {audiobooks.slice(0, 6).map((audiobook, index) => (
+                <div
+                  key={audiobook.id}
+                  className="group bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl overflow-hidden hover:bg-white/15 hover:border-white/30 transition-all duration-500 hover:transform hover:scale-105 cursor-pointer"
+                  onClick={() => goToAudiobookPage(audiobook.id)}
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  <div className="relative">
+                    <img
+                      src={audiobook.cover_image || "/api/placeholder/280/200"}
+                      alt={audiobook.title}
+                      className="w-full h-48 object-cover"
+                    />
+
+
+                    {audiobook.is_premium && (
+                      <div
+                        className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1 ${
+                          audiobook.is_purchased
+                            ? "bg-emerald-500 text-white"
+                            : "bg-amber-500 text-white"
+                        }`}
+                      >
+                        {audiobook.is_purchased ? (
+                          <>
+                            <CheckCircle className="w-3 h-3" />
+                            <span>ZAKUPIONE</span>
+                          </>
+                        ) : (
+                          <>
+                            <Lock className="w-3 h-3" />
+                            <span>{audiobook.price} PLN</span>
+                          </>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <button
+                        className={`w-16 h-16 rounded-full flex items-center justify-center transition-transform hover:scale-110 ${
+                          hasAccess(audiobook)
+                            ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                            : "bg-gray-600 text-gray-400 cursor-not-allowed"
+                        }`}
+                      >
+                        {hasAccess(audiobook) ? (
+                          <Play className="w-6 h-6 ml-1" />
+                        ) : (
+                          <Lock className="w-6 h-6" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="p-6 space-y-3">
+                    <h3 className="text-lg font-semibold text-white line-clamp-2">
+                      {audiobook.title}
+                    </h3>
+
+                    <p className="text-white/70 text-sm">
+                      {audiobook.author_name}
+                    </p>
+
+                    <div className="flex items-center justify-between text-xs text-white/60">
+                      <span>Czyta: {audiobook.narrator}</span>
+                      {audiobook.duration_formatted && (
+                        <span>{audiobook.duration_formatted}</span>
+                      )}
+                    </div>
+
+                    {audiobook.average_rating && (
+                      <div className="flex items-center space-x-2">
+                        <div className="flex items-center">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`w-4 h-4 ${
+                                i < Math.floor(audiobook.average_rating)
+                                  ? "text-amber-400 fill-current"
+                                  : "text-gray-400"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-sm text-white/60">
+                          {audiobook.average_rating}
+                        </span>
+                      </div>
+                    )}
+
+                    {audiobook.is_premium && !audiobook.is_purchased ? (
+                      <button
+                        onClick={(e) => handleQuickPurchase(audiobook, e)}
+                        className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold py-2 px-4 rounded-xl transition-all duration-300 flex items-center justify-center space-x-2"
+                      >
+                        <ShoppingCart className="w-4 h-4" />
+                        <span>Kup za {audiobook.price} PLN</span>
+                      </button>
+                    ) : (
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <LibraryButton
+                          audiobook={audiobook}
+                          onStatusChange={fetchData}
+                          size="small"
+                          fullWidth
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+
+        <section className="space-y-8">
+          <div className="flex items-center space-x-3">
+            <User className="w-8 h-8 text-purple-400" />
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-red-400 bg-clip-text text-transparent">
+              Autorzy
+            </h2>
+          </div>
+
+          {authors.length === 0 ? (
+            <div className="text-center py-16">
+              <p className="text-xl text-white/60">Brak autorów</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {authors.slice(0, 8).map((author, index) => (
+                <div
+                  key={author.id}
+                  className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-500 hover:transform hover:scale-105 cursor-pointer"
+                  onClick={() => goToAuthorPage(author.id)}
+                  style={{ animationDelay: `${(index + 2) * 0.1}s` }}
+                >
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                      {author.name.charAt(0)}
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-white">
+                        {author.name}
+                      </h3>
+                      <p className="text-sm text-white/60">
+                        {author.audiobooks_count} audiobooków
+                      </p>
+                    </div>
+                  </div>
+                  {author.bio && (
+                    <p className="text-sm text-white/70 leading-relaxed">
+                      {author.bio.length > 100
+                        ? `${author.bio.substring(0, 100)}...`
+                        : author.bio}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+
+        {selectedAudiobook && (
+          <section className="space-y-8">
+            <div className="flex items-center space-x-3">
+              <PlayCircle className="w-8 h-8 text-blue-400" />
+              <h2 className="text-4xl font-bold text-white">
+                Rozdziały: {selectedAudiobook.title}
+              </h2>
+              {selectedAudiobook.is_premium && (
+                <div
+                  className={`px-3 py-1 rounded-full text-sm font-bold flex items-center space-x-1 ${
+                    selectedAudiobook.is_purchased
+                      ? "bg-emerald-500 text-white"
+                      : "bg-amber-500 text-white"
+                  }`}
+                >
+                  {selectedAudiobook.is_purchased ? (
+                    <>
+                      <CheckCircle className="w-4 h-4" />
+                      <span>ZAKUPIONE</span>
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="w-4 h-4" />
+                      <span>PREMIUM</span>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {chaptersLoading ? (
+              <div className="text-center py-16">
+                <Loader className="w-10 h-10 animate-spin text-blue-400 mx-auto" />
+              </div>
+            ) : !hasAccess(selectedAudiobook) ? (
+              <div className="bg-gradient-to-r from-amber-500/20 to-orange-600/20 backdrop-blur-xl border border-amber-500/30 rounded-3xl p-12 text-center">
+                <Lock className="w-16 h-16 text-amber-400 mx-auto mb-6" />
+                <h3 className="text-2xl font-bold text-white mb-4">
+                  Audiobook Premium
+                </h3>
+                <p className="text-xl text-white/80 mb-8">
+                  Ten audiobook jest dostępny w wersji premium za{" "}
+                  {selectedAudiobook.price} PLN
+                </p>
+                <button
+                  onClick={(e) => handleQuickPurchase(selectedAudiobook, e)}
+                  className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold py-3 px-8 rounded-xl text-lg transition-all duration-300 hover:scale-105 flex items-center space-x-2 mx-auto"
+                >
+                  <ShoppingCart className="w-5 h-5" />
+                  <span>Kup za {selectedAudiobook.price} PLN</span>
+                </button>
+              </div>
+            ) : chapters.length === 0 ? (
+              <div className="text-center py-16">
+                <p className="text-xl text-white/60">
+                  Brak rozdziałów dla tego audiobooka
+                </p>
+              </div>
+            ) : (
+              <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 space-y-8">
+                <div className="text-center space-y-4">
+                  <h3 className="text-2xl font-bold text-white">
+                    Rozdział {chapters[currentChapterIndex]?.chapter_number}
+                  </h3>
+                  <h4 className="text-xl text-white/80">
+                    {chapters[currentChapterIndex]?.title}
+                  </h4>
+                  <div className="flex items-center justify-center space-x-2 text-white/60">
+                    <Clock className="w-4 h-4" />
+                    <span>
+                      {chapters[currentChapterIndex]?.duration_formatted}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-center space-x-6">
+                  <button
+                    onClick={prevChapter}
+                    disabled={currentChapterIndex === 0}
+                    className="w-12 h-12 bg-white/10 border border-white/20 rounded-xl flex items-center justify-center hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <SkipBack className="w-6 h-6" />
+                  </button>
+
+                  <button className="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center hover:scale-110 transition-transform shadow-2xl">
+                    <Play className="w-10 h-10 ml-1" />
+                  </button>
+
+                  <button
+                    onClick={nextChapter}
+                    disabled={currentChapterIndex === chapters.length - 1}
+                    className="w-12 h-12 bg-white/10 border border-white/20 rounded-xl flex items-center justify-center hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <SkipForward className="w-6 h-6" />
+                  </button>
+                </div>
+
+                <div className="text-center">
+                  <p className="text-white/60">
+                    {currentChapterIndex + 1} z {chapters.length} rozdziałów
+                  </p>
+                </div>
+
+
+                <div className="flex flex-wrap gap-2 justify-center max-h-32 overflow-y-auto p-2">
+                  {chapters.map((chapter, index) => (
+                    <button
+                      key={chapter.id}
+                      onClick={() => setCurrentChapterIndex(index)}
+                      className={`min-w-[3rem] h-10 px-3 rounded-lg text-sm font-medium transition-all ${
+                        index === currentChapterIndex
+                          ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
+                          : "bg-white/10 text-white/70 hover:bg-white/20"
+                      }`}
+                    >
+                      {chapter.chapter_number}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="text-center">
+                  <LibraryButton
+                    audiobook={selectedAudiobook}
+                    onStatusChange={fetchData}
+                    style={{ minWidth: "200px" }}
+                  />
+                </div>
+              </div>
+            )}
+          </section>
+        )}
+      </div>
+
+      {selectedAudiobookForPayment && (
+        <RealStripePayment
+          open={stripeDialog}
+          onClose={() => {
+            setStripeDialog(false);
+            setSelectedAudiobookForPayment(null);
+          }}
+          audiobook={selectedAudiobookForPayment}
+          onSuccess={handlePaymentSuccess}
+        />
+      )}
+    </div>
+  );
 };
 
 export default Home;

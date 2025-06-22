@@ -7,7 +7,6 @@ router = DefaultRouter()
 router.register('register', RegisterViewset, basename='register')
 router.register('login', LoginViewset, basename='login')
 router.register('users', UserViewset, basename='users')
-# brand new viewsets 
 router.register('authors', AuthorViewSet)
 router.register('categories', CategoryViewSet)
 router.register('audiobooks', AudiobookViewSet)
@@ -21,4 +20,6 @@ urlpatterns = router.urls + [
     path('payments/create-intent/', create_payment_intent, name='create-payment-intent'),
     path('payments/confirm/', confirm_payment, name='confirm-payment'),
     path('payments/config/', get_stripe_config, name='stripe-config'),
+    path('auth/google/', google_auth, name='google_auth'),
+    
 ]

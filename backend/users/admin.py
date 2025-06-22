@@ -3,7 +3,6 @@ from .models import *
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from .utils import get_file_size_display
-# Register your models here.
 
 admin.site.register(CustomUser)
 
@@ -46,7 +45,7 @@ class AudiobookAdmin(admin.ModelAdmin):
     list_filter = ['category', 'author', 'is_premium', 'is_featured', 'publication_date']
     search_fields = ['title', 'author__name', 'narrator']
     readonly_fields = ['cover_preview', 'total_file_size', 'created_at']
-    list_editable = ['is_premium', 'price', 'is_featured']  # Dodane edytowalne pola
+    list_editable = ['is_premium', 'price', 'is_featured']
     
     fieldsets = (
         ('Podstawowe informacje', {
@@ -59,7 +58,7 @@ class AudiobookAdmin(admin.ModelAdmin):
             'fields': ('narrator', 'duration_minutes', 'publication_date')
         }),
         ('Ustawienia', {
-            'fields': ('is_featured', 'is_premium', 'price')  # Dodane pola premium
+            'fields': ('is_featured', 'is_premium', 'price')
         }),
         ('Statystyki', {
             'fields': ('total_file_size', 'created_at'),
@@ -123,7 +122,7 @@ class ChapterAdmin(admin.ModelAdmin):
 class UserLibraryAdmin(admin.ModelAdmin):
     list_display = ['user', 'audiobook', 'added_at', 'is_favorite']
     list_filter = ['is_favorite', 'added_at', 'audiobook__category']
-    search_fields = ['user__email', 'audiobook__title']  # Zmienione z username na email
+    search_fields = ['user__email', 'audiobook__title']
     date_hierarchy = 'added_at'
 
 @admin.register(ListeningProgress)
@@ -131,7 +130,7 @@ class ListeningProgressAdmin(admin.ModelAdmin):
     list_display = ['user', 'audiobook', 'current_chapter', 'progress_percentage', 
                    'is_completed', 'last_listened']
     list_filter = ['is_completed', 'last_listened', 'audiobook__category']
-    search_fields = ['user__email', 'audiobook__title']  # Zmienione z username na email
+    search_fields = ['user__email', 'audiobook__title']
     readonly_fields = ['progress_percentage']
     date_hierarchy = 'last_listened'
     
@@ -143,7 +142,7 @@ class ListeningProgressAdmin(admin.ModelAdmin):
 class RatingAdmin(admin.ModelAdmin):
     list_display = ['user', 'audiobook', 'rating', 'created_at', 'review_preview']
     list_filter = ['rating', 'created_at', 'audiobook__category']
-    search_fields = ['user__email', 'audiobook__title', 'review']  # Zmienione z username na email
+    search_fields = ['user__email', 'audiobook__title', 'review']
     date_hierarchy = 'created_at'
     
     def review_preview(self, obj):
@@ -195,7 +194,6 @@ class PurchaseAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('user', 'audiobook', 'audiobook__author')
 
-# Dodatkowe konfiguracje
 admin.site.site_header = "Panel Administracyjny - Audiobooki"
 admin.site.site_title = "Audiobooki Admin"
 admin.site.index_title = "Zarządzanie Audiobookami"

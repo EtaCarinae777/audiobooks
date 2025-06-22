@@ -1,332 +1,319 @@
-// frontend/src/components/RealStripePayment.jsx
-import React, { useState, useEffect } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
+import React, { useState, useEffect } from "react";
+import { loadStripe } from "@stripe/stripe-js";
 import {
-    Elements,
-    CardElement,
-    useStripe,
-    useElements
-} from '@stripe/react-stripe-js';
+  Elements,
+  CardElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js";
 import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Button,
-    Typography,
-    Box,
-    CircularProgress,
-    Alert,
-    Card,
-    CardContent,
-    Chip
-} from '@mui/material';
-import {
-    Lock,
-    CheckCircle,
-    Error,
-    CreditCard
-} from '@mui/icons-material';
-import AxiosInstance from './AxiosInstance';
+  Lock,
+  CheckCircle,
+  AlertCircle,
+  CreditCard,
+  X,
+  Loader,
+  Crown,
+} from "lucide-react";
+import AxiosInstance from "./AxiosInstance.jsx";
 
 // Styl dla Stripe Card Element
 const cardStyle = {
-    style: {
-        base: {
-            color: '#ffffff',
-            fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
-            fontSmoothing: 'antialiased',
-            fontSize: '16px',
-            '::placeholder': {
-                color: 'rgba(255, 255, 255, 0.6)',
-            },
-        },
-        invalid: {
-            color: '#fa755a',
-            iconColor: '#fa755a',
-        },
+  style: {
+    base: {
+      color: "#ffffff",
+      fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+      fontSmoothing: "antialiased",
+      fontSize: "16px",
+      "::placeholder": {
+        color: "rgba(255, 255, 255, 0.6)",
+      },
     },
+    invalid: {
+      color: "#fa755a",
+      iconColor: "#fa755a",
+    },
+  },
 };
 
 // Komponent formularza płatności
 const CheckoutForm = ({ audiobook, onSuccess, onError, clientSecret }) => {
-    const stripe = useStripe();
-    const elements = useElements();
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
+  const stripe = useStripe();
+  const elements = useElements();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        
-        if (!stripe || !elements) {
-            return;
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!stripe || !elements) {
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    const cardElement = elements.getElement(CardElement);
+
+    try {
+      // Potwierdź płatność przez Stripe
+      const { error, paymentIntent } = await stripe.confirmCardPayment(
+        clientSecret,
+        {
+          payment_method: {
+            card: cardElement,
+          },
         }
+      );
 
-        setLoading(true);
-        setError('');
+      if (error) {
+        setError(error.message);
+      } else if (paymentIntent.status === "succeeded") {
+        // Powiadom backend o sukcesie płatności
+        const response = await AxiosInstance.post("/payments/confirm/", {
+          payment_intent_id: paymentIntent.id,
+        });
 
-        const cardElement = elements.getElement(CardElement);
+        onSuccess(response.data.message);
+      }
+    } catch (err) {
+      setError(err.response?.data?.error || "Wystąpił błąd podczas płatności");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        try {
-            // Potwierdź płatność przez Stripe
-            const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-                payment_method: {
-                    card: cardElement,
-                }
-            });
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex items-start space-x-3">
+          <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+          <p className="text-red-300 text-sm">{error}</p>
+        </div>
+      )}
 
-            if (error) {
-                setError(error.message);
-            } else if (paymentIntent.status === 'succeeded') {
-                // Powiadom backend o sukcesie płatności
-                const response = await AxiosInstance.post('/payments/confirm/', {
-                    payment_intent_id: paymentIntent.id
-                });
-                
-                onSuccess(response.data.message);
-            }
-        } catch (err) {
-            setError(err.response?.data?.error || 'Wystąpił błąd podczas płatności');
-        } finally {
-            setLoading(false);
-        }
-    };
+      <div className="bg-white/10 border border-white/20 rounded-xl p-4">
+        <div className="flex items-center space-x-2 mb-3">
+          <CreditCard className="w-5 h-5 text-white/70" />
+          <span className="text-white/80 font-medium">
+            Dane karty kredytowej
+          </span>
+        </div>
+        <div className="p-3 bg-white/5 rounded-lg border border-white/10">
+          <CardElement options={cardStyle} />
+        </div>
+      </div>
 
-    return (
-        <form onSubmit={handleSubmit}>
-            {error && (
-                <Alert 
-                    severity="error" 
-                    sx={{ mb: 2, background: 'rgba(244, 67, 54, 0.1)', color: 'white' }}
-                    icon={<Error sx={{ color: '#ef4444' }} />}
-                >
-                    {error}
-                </Alert>
-            )}
+      {/* Testowe karty */}
+      <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4">
+        <div className="flex items-start space-x-3">
+          <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+            <span className="text-white text-xs font-bold">i</span>
+          </div>
+          <div>
+            <p className="text-blue-300 font-medium text-sm mb-2">
+              Testowe karty Stripe:
+            </p>
+            <div className="space-y-1 text-blue-200 text-xs">
+              <p>
+                <strong>4242 4242 4242 4242</strong> - zawsze sukces
+              </p>
+              <p>
+                <strong>4000 0000 0000 0002</strong> - karta odrzucona
+              </p>
+              <p>
+                <strong>4000 0000 0000 9995</strong> - niewystarczające środki
+              </p>
+              <p>Data: dowolna przyszła • CVC: dowolne 3 cyfry</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
-            <Box sx={{ 
-                mb: 3, 
-                p: 2, 
-                background: 'rgba(255, 255, 255, 0.1)', 
-                borderRadius: '8px',
-                border: '1px solid rgba(255, 255, 255, 0.2)'
-            }}>
-                <Box display="flex" alignItems="center" sx={{ mb: 1 }}>
-                    <CreditCard sx={{ mr: 1, color: 'rgba(255, 255, 255, 0.7)' }} />
-                    <Typography variant="subtitle2" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-                        Dane karty kredytowej
-                    </Typography>
-                </Box>
-                <CardElement options={cardStyle} />
-            </Box>
-
-            {/* Testowe karty */}
-            <Alert 
-                severity="info" 
-                sx={{ 
-                    mb: 3, 
-                    background: 'rgba(59, 130, 246, 0.1)', 
-                    color: 'rgba(147, 197, 253, 1)',
-                    border: '1px solid rgba(59, 130, 246, 0.3)'
-                }}
-            >
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                    <strong>Testowe karty Stripe:</strong>
-                </Typography>
-                <Typography variant="body2" component="div">
-                    • <strong>4242 4242 4242 4242</strong> - zawsze sukces<br/>
-                    • <strong>4000 0000 0000 0002</strong> - karta odrzucona<br/>
-                    • <strong>4000 0000 0000 9995</strong> - niewystarczające środki<br/>
-                    • Data: dowolna przyszła • CVC: dowolne 3 cyfry
-                </Typography>
-            </Alert>
-
-            <Button
-                type="submit"
-                disabled={!stripe || loading}
-                variant="contained"
-                fullWidth
-                sx={{
-                    background: 'linear-gradient(135deg, #10b981, #059669)',
-                    color: 'white',
-                    py: 1.5,
-                    fontSize: '1.1rem',
-                    fontWeight: 'bold',
-                    '&:hover': {
-                        background: 'linear-gradient(135deg, #059669, #047857)'
-                    },
-                    '&:disabled': {
-                        background: 'rgba(156, 163, 175, 0.3)'
-                    }
-                }}
-            >
-                {loading ? (
-                    <Box display="flex" alignItems="center">
-                        <CircularProgress size={20} sx={{ mr: 1, color: 'white' }} />
-                        Przetwarzanie płatności...
-                    </Box>
-                ) : (
-                    `Zapłać ${audiobook.price} PLN`
-                )}
-            </Button>
-        </form>
-    );
+      <button
+        type="submit"
+        disabled={!stripe || loading}
+        className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 disabled:from-gray-600 disabled:to-gray-600 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 hover:scale-105 disabled:hover:scale-100 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+      >
+        {loading ? (
+          <>
+            <Loader className="w-5 h-5 animate-spin" />
+            <span>Przetwarzanie płatności...</span>
+          </>
+        ) : (
+          <span>Zapłać {audiobook.price} PLN</span>
+        )}
+      </button>
+    </form>
+  );
 };
 
 // Główny komponent
 const RealStripePayment = ({ open, onClose, audiobook, onSuccess }) => {
-    const [stripePromise, setStripePromise] = useState(null);
-    const [clientSecret, setClientSecret] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
+  const [stripePromise, setStripePromise] = useState(null);
+  const [clientSecret, setClientSecret] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-    useEffect(() => {
-        // Pobierz konfigurację Stripe
-        const getStripeConfig = async () => {
-            try {
-                const response = await AxiosInstance.get('/payments/config/');
-                const stripe = await loadStripe(response.data.publishable_key);
-                setStripePromise(stripe);
-            } catch (error) {
-                console.error('Error loading Stripe:', error);
-                setError('Nie udało się załadować systemu płatności');
-            }
-        };
-
-        if (open) {
-            getStripeConfig();
-        }
-    }, [open]);
-
-    useEffect(() => {
-        // Utwórz PaymentIntent gdy dialog się otwiera
-        const createPaymentIntent = async () => {
-            if (!audiobook || !open) return;
-
-            try {
-                setLoading(true);
-                const response = await AxiosInstance.post('/payments/create-intent/', {
-                    audiobook_id: audiobook.id
-                });
-                setClientSecret(response.data.client_secret);
-            } catch (error) {
-                console.error('Error creating payment intent:', error);
-                setError(error.response?.data?.error || 'Nie udało się utworzyć płatności');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (open && stripePromise) {
-            createPaymentIntent();
-        }
-    }, [open, audiobook, stripePromise]);
-
-    const handleSuccess = (message) => {
-        onSuccess(message);
-        onClose();
+  useEffect(() => {
+    // Pobierz konfigurację Stripe
+    console.log("🔧 getStripeConfig useEffect triggered, open:", open);
+    const getStripeConfig = async () => {
+      try {
+        const response = await AxiosInstance.get("/payments/config/");
+        const stripe = await loadStripe(response.data.publishable_key);
+        setStripePromise(stripe);
+      } catch (error) {
+        setError("Nie udało się załadować systemu płatności");
+      }
     };
 
-    const handleError = (errorMessage) => {
-        setError(errorMessage);
+    if (open) {
+      getStripeConfig();
+    }
+  }, [open]);
+
+  useEffect(() => {
+    // Utwórz PaymentIntent gdy dialog się otwiera
+    const createPaymentIntent = async () => {
+      if (!audiobook || !open) return;
+
+      try {
+        setLoading(true);
+        console.log(
+          "📡 About to send POST request to:",
+          "/payments/create-intent/"
+        );
+        const response = await AxiosInstance.post("/payments/create-intent/", {
+          audiobook_id: audiobook.id,
+        });
+        setClientSecret(response.data.client_secret);
+      } catch (error) {
+        setError(
+          error.response?.data?.error || "Nie udało się utworzyć płatności"
+        );
+      } finally {
+        setLoading(false);
+      }
     };
+    if (open && stripePromise) {
+      createPaymentIntent();
+    }
+  }, [open, audiobook, stripePromise]);
 
-    const handleClose = () => {
-        setClientSecret('');
-        setError('');
-        onClose();
-    };
+  const handleSuccess = (message) => {
+    onSuccess(message);
+    onClose();
+  };
 
-    return (
-        <Dialog 
-            open={open} 
-            onClose={handleClose} 
-            maxWidth="sm" 
-            fullWidth
-            PaperProps={{
-                sx: {
-                    background: 'linear-gradient(135deg, rgba(15, 29, 77, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    color: 'white'
-                }
-            }}
-        >
-            <DialogTitle sx={{ color: 'white', pb: 1 }}>
-                <Box display="flex" alignItems="center">
-                    <Lock sx={{ mr: 1, color: '#10b981' }} />
-                    Płatność przez Stripe
-                </Box>
-            </DialogTitle>
+  const handleError = (errorMessage) => {
+    setError(errorMessage);
+  };
 
-            <DialogContent>
-                {/* Informacje o audiobooku */}
-                <Card sx={{ 
-                    mb: 3, 
-                    background: 'rgba(255, 255, 255, 0.1)', 
-                    border: '1px solid rgba(255, 255, 255, 0.2)' 
-                }}>
-                    <CardContent>
-                        <Typography variant="h6" sx={{ color: 'white', mb: 1 }}>
-                            {audiobook.title}
-                        </Typography>
-                        <Typography sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 2 }}>
-                            {audiobook.author_name}
-                        </Typography>
-                        <Box display="flex" justifyContent="space-between" alignItems="center">
-                            <Typography variant="h5" sx={{ color: '#10b981', fontWeight: 'bold' }}>
-                                {audiobook.price} PLN
-                            </Typography>
-                            <Chip 
-                                label="PREMIUM" 
-                                icon={<CheckCircle />}
-                                sx={{ 
-                                    background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-                                    color: 'white'
-                                }}
-                            />
-                        </Box>
-                    </CardContent>
-                </Card>
+  const handleClose = () => {
+    setClientSecret("");
+    setError("");
+    onClose();
+  };
 
-                {error && (
-                    <Alert 
-                        severity="error" 
-                        sx={{ mb: 2, background: 'rgba(244, 67, 54, 0.1)', color: 'white' }}
-                    >
-                        {error}
-                    </Alert>
-                )}
+  if (!open) return null;
 
-                {loading ? (
-                    <Box display="flex" justifyContent="center" alignItems="center" sx={{ py: 4 }}>
-                        <CircularProgress sx={{ color: '#10b981' }} />
-                        <Typography sx={{ ml: 2, color: 'white' }}>
-                            Przygotowywanie płatności...
-                        </Typography>
-                    </Box>
-                ) : stripePromise && clientSecret ? (
-                    <Elements stripe={stripePromise}>
-                        <CheckoutForm
-                            audiobook={audiobook}
-                            onSuccess={handleSuccess}
-                            onError={handleError}
-                            clientSecret={clientSecret}
-                        />
-                    </Elements>
-                ) : null}
-            </DialogContent>
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={handleClose}
+      ></div>
 
-            <DialogActions sx={{ p: 3 }}>
-                <Button 
-                    onClick={handleClose}
-                    sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
-                >
-                    Anuluj
-                </Button>
-            </DialogActions>
-        </Dialog>
-    );
+      {/* Modal */}
+      <div className="relative w-full max-w-md bg-gradient-to-br from-slate-900/95 via-blue-900/95 to-slate-800/95 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-white/10">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full flex items-center justify-center">
+              <Lock className="w-5 h-5 text-white" />
+            </div>
+            <h2 className="text-xl font-bold text-white">
+              Płatność przez Stripe
+            </h2>
+          </div>
+          <button
+            onClick={handleClose}
+            className="p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-6 space-y-6">
+          {/* Informacje o audiobooku */}
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl p-4">
+            <div className="flex items-start space-x-4">
+              <img
+                src={audiobook.cover_image || "/api/placeholder/80/80"}
+                alt={audiobook.title}
+                className="w-16 h-16 rounded-lg object-cover"
+              />
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-white mb-1">
+                  {audiobook.title}
+                </h3>
+                <p className="text-white/70 text-sm mb-3">
+                  {audiobook.author_name}
+                </p>
+                <div className="flex items-center justify-between">
+                  <span className="text-2xl font-bold text-emerald-400">
+                    {audiobook.price} PLN
+                  </span>
+                  <div className="flex items-center space-x-2 px-3 py-1 bg-gradient-to-r from-amber-500/20 to-orange-600/20 border border-amber-500/30 rounded-full">
+                    <Crown className="w-4 h-4 text-amber-400" />
+                    <span className="text-amber-300 text-sm font-bold">
+                      PREMIUM
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex items-start space-x-3">
+              <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+              <p className="text-red-300">{error}</p>
+            </div>
+          )}
+
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-12 space-y-4">
+              <Loader className="w-12 h-12 animate-spin text-emerald-400" />
+              <p className="text-white/80">Przygotowywanie płatności...</p>
+            </div>
+          ) : stripePromise && clientSecret ? (
+            <Elements stripe={stripePromise}>
+              <CheckoutForm
+                audiobook={audiobook}
+                onSuccess={handleSuccess}
+                onError={handleError}
+                clientSecret={clientSecret}
+              />
+            </Elements>
+          ) : null}
+        </div>
+
+        {/* Footer */}
+        <div className="flex justify-end p-6 border-t border-white/10">
+          <button
+            onClick={handleClose}
+            className="px-4 py-2 text-white/70 hover:text-white transition-colors"
+          >
+            Anuluj
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default RealStripePayment;

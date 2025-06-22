@@ -1,495 +1,353 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import AxiosInstance from './AxiosInstance';
-import {Box, Card, CardContent, CardMedia,
-    Typography,
-    Grid,
-    Chip,
-    Button,
-    CircularProgress,
-    Alert,
-    Rating,
-    IconButton,
-    Tooltip,
-    Avatar,
-    Paper,
-    TextField,
-    InputAdornment,
-    Tab,
-    Tabs,
-    Collapse
-} from '@mui/material';
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import AxiosInstance from "./AxiosInstance";
 import {
-    PlayArrow,
-    LibraryAdd,
-    LibraryAddCheck,
-    Person,
-    MenuBook,
-    Search as SearchIcon,
-    ArrowBack,
-    ExpandMore,
-    ExpandLess,
-    Category
-} from '@mui/icons-material';
-import LibraryButton from './forms/LibraryButton';
+  Play,
+  User,
+  BookOpen,
+  Search,
+  ArrowLeft,
+  ChevronDown,
+  ChevronUp,
+  Tag,
+  X,
+  Star,
+  Clock,
+  Loader,
+} from "lucide-react";
+import LibraryButton from "./forms/LibraryButton";
 
 const AuthorPage = () => {
-    const { id } = useParams();
-    const navigate = useNavigate();
-    
-    const [author, setAuthor] = useState(null); 
-    const [audiobooks, setAudiobooks] = useState([]);
-    const [filteredAudiobooks, setFilteredAudiobooks] = useState([]);
-    const [categories, setCategories] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState('all');
-    const [searchQuery, setSearchQuery] = useState('');
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [expandedBio, setExpandedBio] = useState(false);
+  const { id } = useParams();
+  const navigate = useNavigate();
 
-    // Pobierz dane autora i jego audiobooki
-    const fetchAuthorData = async () => {
-        try {
-            setLoading(true);
-            
-            // Pobierz dane autora
-            const authorRes = await AxiosInstance.get(`authors/${id}/`);
-            setAuthor(authorRes.data);
-            
-            // Pobierz audiobooki autora
-            const audiobooksRes = await AxiosInstance.get(`authors/${id}/audiobooks/`);
-            setAudiobooks(audiobooksRes.data);
-            setFilteredAudiobooks(audiobooksRes.data);
-            
-            // Wyodrębnij unikalne kategorie z audiobooków
-            const uniqueCategories = [...new Set(
-                audiobooksRes.data.map(book => book.category_name).filter(Boolean)
-            )];
-            setCategories(uniqueCategories);
-            
-        } catch (error) {
-            console.error('Error fetching author data:', error);
-            setError('Nie udało się pobrać danych autora');
-        } finally {
-            setLoading(false);
-        }
-    };
+  const [author, setAuthor] = useState(null);
+  const [audiobooks, setAudiobooks] = useState([]);
+  const [filteredAudiobooks, setFilteredAudiobooks] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [expandedBio, setExpandedBio] = useState(false);
 
-    // Filtrowanie audiobooków
-    useEffect(() => {
-        let filtered = audiobooks;
+  const fetchAuthorData = async () => {
+    try {
+      setLoading(true);
 
-        // Filtrowanie po kategorii
-        if (selectedCategory !== 'all') {
-            filtered = filtered.filter(book => book.category_name === selectedCategory);
-        }
+      const authorRes = await AxiosInstance.get(`authors/${id}/`);
+      setAuthor(authorRes.data);
 
-        // Filtrowanie po wyszukiwaniu
-        if (searchQuery.trim()) {
-            filtered = filtered.filter(book =>
-                book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                book.description?.toLowerCase().includes(searchQuery.toLowerCase())
-            );
-        }
+      const audiobooksRes = await AxiosInstance.get(
+        `authors/${id}/audiobooks/`
+      );
+      setAudiobooks(audiobooksRes.data);
+      setFilteredAudiobooks(audiobooksRes.data);
 
-        setFilteredAudiobooks(filtered);
-    }, [selectedCategory, searchQuery, audiobooks]);
+      const uniqueCategories = [
+        ...new Set(
+          audiobooksRes.data.map((book) => book.category_name).filter(Boolean)
+        ),
+      ];
+      setCategories(uniqueCategories);
+    } catch (error) {
+      console.error("Error fetching author data:", error);
+      setError("Nie udało się pobrać danych autora");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
+    let filtered = audiobooks;
 
-    // Grupa audiobooków według kategorii
-    const groupedAudiobooks = categories.reduce((acc, category) => {
-        acc[category] = filteredAudiobooks.filter(book => book.category_name === category);
-        return acc;
-    }, {});
-
-    useEffect(() => {
-        fetchAuthorData();
-    }, [id]);
-
-    if (loading) {
-        return (
-            <div style={{ 
-                display: 'flex', 
-                justifyContent: 'center', 
-                alignItems: 'center', 
-                minHeight: '60vh',
-                flexDirection: 'column'
-            }}>
-                <CircularProgress size={60} sx={{ color: '#667eea' }} />
-                <Typography sx={{ mt: 2, color: 'rgba(255, 255, 255, 0.7)' }}>
-                    Ładowanie danych autora...
-                </Typography>
-            </div>
-        );
+    if (selectedCategory !== "all") {
+      filtered = filtered.filter(
+        (book) => book.category_name === selectedCategory
+      );
     }
 
-    if (error) {
-        return (
-            <div style={{ padding: '2rem' }}>
-                <Alert severity="error" sx={{ background: 'rgba(244, 67, 54, 0.1)', color: 'white' }}>
-                    {error}
-                </Alert>
-            </div>
-        );
+    if (searchQuery.trim()) {
+      filtered = filtered.filter(
+        (book) =>
+          book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          book.description?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
     }
 
-    if (!author) {
-        return (
-            <div style={{ padding: '2rem' }}>
-                <Alert severity="warning" sx={{ background: 'rgba(255, 152, 0, 0.1)', color: 'white' }}>
-                    Autor nie został znaleziony
-                </Alert>
-            </div>
-        );
-    }
+    setFilteredAudiobooks(filtered);
+  }, [selectedCategory, searchQuery, audiobooks]);
 
+  useEffect(() => {
+    fetchAuthorData();
+  }, [id]);
+
+  const clearSearch = () => {
+    setSearchQuery("");
+  };
+
+  const goToAudiobook = (audiobookId) => {
+    navigate(`/audiobook/${audiobookId}`);
+  };
+
+  if (loading) {
     return (
-        <div style={{ 
-            padding: '2rem',
-            background: 'linear-gradient(135deg,rgb(15, 29, 77) 0%, #764ba2 100%)',
-            minHeight: '100vh',
-            color: 'white'
-        }}>
-            {/* Przycisk powrotu */}
-            <Button
-                startIcon={<ArrowBack />}
-                onClick={() => navigate(-1)}
-                sx={{
-                    mb: 3,
-                    color: 'white',
-                    borderColor: 'rgba(255, 255, 255, 0.3)',
-                    '&:hover': {
-                        borderColor: 'white',
-                        background: 'rgba(255, 255, 255, 0.1)'
-                    }
-                }}
-                variant="outlined"
-            >
-                Powrót
-            </Button>
-
-            {/* Sekcja z informacjami o autorze */}
-            <Paper sx={{
-                background: 'rgba(255, 255, 255, 0.1)',
-                backdropFilter: 'blur(10px)',
-                borderRadius: '20px',
-                padding: '2rem',
-                marginBottom: '2rem',
-                border: '1px solid rgba(255, 255, 255, 0.2)'
-            }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '2rem', marginBottom: '1.5rem' }}>
-                    <Avatar
-                        sx={{
-                            width: 120,
-                            height: 120,
-                            fontSize: '2.5rem',
-                            background: 'linear-gradient(135deg, #ec4899, #8b5cf6)',
-                            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
-                        }}
-                    >
-                        {author.name.charAt(0)}
-                    </Avatar>
-                    
-                    <div style={{ flex: 1 }}>
-                        <Typography variant="h3" sx={{
-                            fontWeight: 'bold',
-                            marginBottom: '0.5rem',
-                            background: 'linear-gradient(135deg, #ffffff, #f1f5f9)',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent'
-                        }}>
-                            {author.name}
-                        </Typography>
-                        
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-                            <Chip
-                                icon={<MenuBook />}
-                                label={`${audiobooks.length} audiobooków`}
-                                sx={{
-                                    background: 'rgba(103, 126, 234, 0.3)',
-                                    color: 'white',
-                                    border: '1px solid rgba(103, 126, 234, 0.5)'
-                                }}
-                            />
-                            {categories.length > 0 && (
-                                <Chip
-                                    icon={<Category />}
-                                    label={`${categories.length} kategorii`}
-                                    sx={{
-                                        background: 'rgba(236, 72, 153, 0.3)',
-                                        color: 'white',
-                                        border: '1px solid rgba(236, 72, 153, 0.5)'
-                                    }}
-                                />
-                            )}
-                        </div>
-
-                        {author.bio && (
-                            <div>
-                                <Typography sx={{
-                                    color: 'rgba(255, 255, 255, 0.8)',
-                                    lineHeight: 1.6,
-                                    fontSize: '1.1rem'
-                                }}>
-                                    {expandedBio ? author.bio : `${author.bio.substring(0, 200)}${author.bio.length > 200 ? '...' : ''}`}
-                                </Typography>
-                                
-                                {author.bio.length > 200 && (
-                                    <Button
-                                        onClick={() => setExpandedBio(!expandedBio)}
-                                        endIcon={expandedBio ? <ExpandLess /> : <ExpandMore />}
-                                        sx={{ 
-                                            mt: 1, 
-                                            color: 'rgba(255, 255, 255, 0.7)',
-                                            textTransform: 'none'
-                                        }}
-                                    >
-                                        {expandedBio ? 'Zwiń' : 'Czytaj więcej'}
-                                    </Button>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </Paper>
-
-            {/* Sekcja wyszukiwania i filtrowania */}
-            <Paper sx={{
-                background: 'rgba(255, 255, 255, 0.1)',
-                backdropFilter: 'blur(10px)',
-                borderRadius: '15px',
-                padding: '1.5rem',
-                marginBottom: '2rem',
-                border: '1px solid rgba(255, 255, 255, 0.2)'
-            }}>
-                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap' }}>
-                    <TextField
-                        placeholder="Szukaj wśród audiobooków..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <SearchIcon sx={{ color: 'rgba(255, 255, 255, 0.7)' }} />
-                                </InputAdornment>
-                            ),
-                        }}
-                        sx={{
-                            flex: 1,
-                            minWidth: '250px',
-                            '& .MuiOutlinedInput-root': {
-                                color: 'white',
-                                '& fieldset': {
-                                    borderColor: 'rgba(255, 255, 255, 0.3)',
-                                },
-                                '&:hover fieldset': {
-                                    borderColor: 'rgba(255, 255, 255, 0.5)',
-                                },
-                                '&.Mui-focused fieldset': {
-                                    borderColor: '#667eea',
-                                },
-                            },
-                            '& .MuiOutlinedInput-input::placeholder': {
-                                color: 'rgba(255, 255, 255, 0.5)',
-                            }
-                        }}
-                    />
-                </div>
-
-                {/* Filtry kategorii */}
-                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                    <Chip
-                        label="Wszystkie"
-                        onClick={() => setSelectedCategory('all')}
-                        variant={selectedCategory === 'all' ? 'filled' : 'outlined'}
-                        sx={{
-                            color: selectedCategory === 'all' ? 'white' : 'rgba(255, 255, 255, 0.7)',
-                            background: selectedCategory === 'all' ? 'linear-gradient(135deg, #667eea, #764ba2)' : 'transparent',
-                            borderColor: 'rgba(255, 255, 255, 0.3)',
-                            '&:hover': {
-                                background: selectedCategory === 'all' ? 'linear-gradient(135deg, #667eea, #764ba2)' : 'rgba(255, 255, 255, 0.1)'
-                            }
-                        }}
-                    />
-                    {categories.map((category) => (
-                        <Chip
-                            key={category}
-                            label={category}
-                            onClick={() => setSelectedCategory(category)}
-                            variant={selectedCategory === category ? 'filled' : 'outlined'}
-                            sx={{
-                                color: selectedCategory === category ? 'white' : 'rgba(255, 255, 255, 0.7)',
-                                background: selectedCategory === category ? 'linear-gradient(135deg, #ec4899, #8b5cf6)' : 'transparent',
-                                borderColor: 'rgba(255, 255, 255, 0.3)',
-                                '&:hover': {
-                                    background: selectedCategory === category ? 'linear-gradient(135deg, #ec4899, #8b5cf6)' : 'rgba(255, 255, 255, 0.1)'
-                                }
-                            }}
-                        />
-                    ))}
-                </div>
-            </Paper>
-
-            {/* Wyniki wyszukiwania */}
-            <Typography variant="h5" sx={{ mb: 2, color: 'rgba(255, 255, 255, 0.9)' }}>
-                {searchQuery || selectedCategory !== 'all' 
-                    ? `Znaleziono: ${filteredAudiobooks.length} audiobooków`
-                    : `Wszystkie audiobooki (${audiobooks.length})`
-                }
-            </Typography>
-
-            {/* Lista audiobooków */}
-            {filteredAudiobooks.length === 0 ? (
-                <Paper sx={{
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    backdropFilter: 'blur(10px)',
-                    borderRadius: '15px',
-                    padding: '3rem',
-                    textAlign: 'center',
-                    border: '1px solid rgba(255, 255, 255, 0.2)'
-                }}>
-                    <MenuBook sx={{ fontSize: '4rem', color: 'rgba(255, 255, 255, 0.3)', mb: 2 }} />
-                    <Typography variant="h6" sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>
-                        {searchQuery || selectedCategory !== 'all' 
-                            ? 'Nie znaleziono audiobooków pasujących do kryteriów'
-                            : 'Ten autor nie ma jeszcze audiobooków'
-                        }
-                    </Typography>
-                </Paper>
-            ) : (
-                <Grid container spacing={3}>
-                    {filteredAudiobooks.map((audiobook, index) => (
-                        <Grid item xs={12} sm={6} md={4} lg={3} key={audiobook.id}>
-                            <Card sx={{
-                                background: 'rgba(255, 255, 255, 0.1)',
-                                backdropFilter: 'blur(10px)',
-                                borderRadius: '15px',
-                                border: '1px solid rgba(255, 255, 255, 0.2)',
-                                transition: 'all 0.3s ease',
-                                height: '100%',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                '&:hover': {
-                                    transform: 'translateY(-5px)',
-                                    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
-                                    '& .play-overlay': {
-                                        opacity: 1
-                                    }
-                                }
-                            }}>
-                                <div style={{ position: 'relative' }}>
-                                    <CardMedia
-                                        component="img"
-                                        height="200"
-                                        image={audiobook.cover_image || '/api/placeholder/280/200'}
-                                        alt={audiobook.title}
-                                        style={{ borderRadius: '15px 15px 0 0' }}
-                                    />
-                                    
-                                    {/* Play overlay */}
-                                    <div className="play-overlay" style={{
-                                        position: 'absolute',
-                                        top: 0,
-                                        left: 0,
-                                        right: 0,
-                                        bottom: 0,
-                                        background: 'rgba(0, 0, 0, 0.6)',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        opacity: 0,
-                                        transition: 'opacity 0.3s ease',
-                                        borderRadius: '15px 15px 0 0'
-                                    }}>
-                                        <IconButton
-                                            sx={{
-                                                background: 'linear-gradient(135deg, #667eea, #ec4899)',
-                                                color: 'white',
-                                                width: 60,
-                                                height: 60,
-                                                '&:hover': {
-                                                    transform: 'scale(1.1)'
-                                                }
-                                            }}
-                                        >
-                                            <PlayArrow sx={{ fontSize: 30 }} />
-                                        </IconButton>
-                                    </div>
-                                </div>
-
-                                <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                                    <Typography variant="h6" sx={{
-                                        color: 'white',
-                                        fontWeight: 'bold',
-                                        marginBottom: '0.5rem',
-                                        fontSize: '1.1rem'
-                                    }}>
-                                        {audiobook.title}
-                                    </Typography>
-                                    
-                                    {audiobook.category_name && (
-                                        <Chip
-                                            label={audiobook.category_name}
-                                            size="small"
-                                            sx={{
-                                                background: 'rgba(236, 72, 153, 0.3)',
-                                                color: 'white',
-                                                border: '1px solid rgba(236, 72, 153, 0.5)',
-                                                marginBottom: '0.5rem',
-                                                alignSelf: 'flex-start'
-                                            }}
-                                        />
-                                    )}
-
-                                    <Typography sx={{
-                                        color: 'rgba(255, 255, 255, 0.7)',
-                                        fontSize: '0.9rem',
-                                        marginBottom: '0.5rem'
-                                    }}>
-                                        Czyta: {audiobook.narrator}
-                                    </Typography>
-
-                                    {audiobook.duration_formatted && (
-                                        <Typography sx={{
-                                            color: 'rgba(255, 255, 255, 0.6)',
-                                            fontSize: '0.85rem',
-                                            marginBottom: '1rem'
-                                        }}>
-                                            Czas trwania: {audiobook.duration_formatted}
-                                        </Typography>
-                                    )}
-
-                                    {audiobook.average_rating && (
-                                        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
-                                            <Rating
-                                                value={audiobook.average_rating}
-                                                precision={0.1}
-                                                size="small"
-                                                readOnly
-                                                sx={{ '& .MuiRating-iconFilled': { color: '#fbbf24' } }}
-                                            />
-                                            <Typography sx={{ color: 'rgba(255, 255, 255, 0.6)', ml: 1, fontSize: '0.85rem' }}>
-                                                {audiobook.average_rating}
-                                            </Typography>
-                                        </div>
-                                    )}
-
-                                    <div style={{ marginTop: 'auto' }}>
-                                        <LibraryButton 
-                                            audiobook={audiobook} 
-                                            onStatusChange={fetchAuthorData} 
-                                            size="small" 
-                                            fullWidth 
-                                        />
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                    ))}
-                </Grid>
-            )}
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 text-white flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Loader className="w-16 h-16 animate-spin text-blue-400 mx-auto" />
+          <p className="text-xl text-white/80">Ładowanie danych autora...</p>
         </div>
+      </div>
     );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 text-white flex items-center justify-center p-4">
+        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6 max-w-md">
+          <p className="text-red-300">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!author) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 text-white flex items-center justify-center p-4">
+        <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-6 max-w-md">
+          <p className="text-amber-300">Autor nie został znaleziony</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 text-white">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl"></div>
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center space-x-2 px-4 py-2 bg-white/10 border border-white/20 rounded-xl hover:bg-white/20 transition-all duration-300"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Powrót</span>
+        </button>
+
+        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center space-y-6 lg:space-y-0 lg:space-x-8">
+            <div className="w-32 h-32 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center text-4xl font-bold text-white shadow-2xl">
+              {author.name.charAt(0)}
+            </div>
+
+            <div className="flex-1">
+              <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-purple-400 to-emerald-400 bg-clip-text text-transparent">
+                {author.name}
+              </h1>
+
+              <div className="flex flex-wrap gap-3 mb-6">
+                <div className="flex items-center space-x-2 px-3 py-1 bg-blue-500/20 border border-blue-500/30 rounded-full">
+                  <BookOpen className="w-4 h-4 text-blue-400" />
+                  <span className="text-blue-300 text-sm">
+                    {audiobooks.length} audiobooków
+                  </span>
+                </div>
+                {categories.length > 0 && (
+                  <div className="flex items-center space-x-2 px-3 py-1 bg-pink-500/20 border border-pink-500/30 rounded-full">
+                    <Tag className="w-4 h-4 text-pink-400" />
+                    <span className="text-pink-300 text-sm">
+                      {categories.length} kategorii
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {author.bio && (
+                <div>
+                  <p className="text-white/80 leading-relaxed text-lg">
+                    {expandedBio
+                      ? author.bio
+                      : `${author.bio.substring(0, 200)}${
+                          author.bio.length > 200 ? "..." : ""
+                        }`}
+                  </p>
+
+                  {author.bio.length > 200 && (
+                    <button
+                      onClick={() => setExpandedBio(!expandedBio)}
+                      className="mt-3 flex items-center space-x-2 text-blue-400 hover:text-blue-300 transition-colors"
+                    >
+                      <span>{expandedBio ? "Zwiń" : "Czytaj więcej"}</span>
+                      {expandedBio ? (
+                        <ChevronUp className="w-4 h-4" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4" />
+                      )}
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+          <div className="flex flex-col lg:flex-row gap-4 mb-6">
+            <div className="flex-1 relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-white/60" />
+              </div>
+              <input
+                type="text"
+                placeholder="Szukaj wśród audiobooków..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-10 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-300"
+              />
+              {searchQuery && (
+                <button
+                  onClick={clearSearch}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-white/60 hover:text-white"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setSelectedCategory("all")}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                selectedCategory === "all"
+                  ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
+                  : "bg-white/10 text-white/70 hover:bg-white/20 border border-white/20"
+              }`}
+            >
+              Wszystkie
+            </button>
+            {categories.map((category) => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                  selectedCategory === category
+                    ? "bg-gradient-to-r from-pink-600 to-purple-600 text-white shadow-lg"
+                    : "bg-white/10 text-white/70 hover:bg-white/20 border border-white/20"
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex items-center space-x-3 mb-6">
+          <BookOpen className="w-6 h-6 text-blue-400" />
+          <h2 className="text-2xl font-bold text-white">
+            {searchQuery || selectedCategory !== "all"
+              ? `Znaleziono: ${filteredAudiobooks.length} audiobooków`
+              : `Wszystkie audiobooki (${audiobooks.length})`}
+          </h2>
+        </div>
+
+        {filteredAudiobooks.length === 0 ? (
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-12 text-center">
+            <BookOpen className="w-16 h-16 text-white/30 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-white/60 mb-2">
+              {searchQuery || selectedCategory !== "all"
+                ? "Nie znaleziono audiobooków pasujących do kryteriów"
+                : "Ten autor nie ma jeszcze audiobooków"}
+            </h3>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredAudiobooks.map((audiobook, index) => (
+              <div
+                key={audiobook.id}
+                className="group bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl overflow-hidden hover:bg-white/15 hover:border-white/30 transition-all duration-500 hover:transform hover:scale-105 cursor-pointer"
+                onClick={() => goToAudiobook(audiobook.id)}
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <div className="relative">
+                  <img
+                    src={audiobook.cover_image || "/api/placeholder/280/200"}
+                    alt={audiobook.title}
+                    className="w-full h-48 object-cover"
+                  />
+
+                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <button className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center hover:scale-110 transition-transform">
+                      <Play className="w-6 h-6 text-white ml-1" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="p-6">
+                  <h3 className="text-lg font-semibold text-white mb-2 line-clamp-2">
+                    {audiobook.title}
+                  </h3>
+
+                  {audiobook.category_name && (
+                    <div className="inline-flex items-center space-x-1 px-2 py-1 bg-pink-500/20 border border-pink-500/30 rounded-full mb-3">
+                      <Tag className="w-3 h-3 text-pink-400" />
+                      <span className="text-pink-300 text-xs">
+                        {audiobook.category_name}
+                      </span>
+                    </div>
+                  )}
+
+                  <p className="text-white/70 text-sm mb-2">
+                    Czyta: {audiobook.narrator}
+                  </p>
+
+                  {audiobook.duration_formatted && (
+                    <div className="flex items-center space-x-1 text-white/60 text-sm mb-4">
+                      <Clock className="w-4 h-4" />
+                      <span>{audiobook.duration_formatted}</span>
+                    </div>
+                  )}
+
+                  {audiobook.average_rating && (
+                    <div className="flex items-center space-x-2 mb-4">
+                      <div className="flex items-center">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`w-4 h-4 ${
+                              i < Math.floor(audiobook.average_rating)
+                                ? "text-amber-400 fill-current"
+                                : "text-gray-600"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-sm text-white/60">
+                        {audiobook.average_rating}
+                      </span>
+                    </div>
+                  )}
+
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <LibraryButton
+                      audiobook={audiobook}
+                      onStatusChange={fetchAuthorData}
+                      size="small"
+                      fullWidth
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default AuthorPage;

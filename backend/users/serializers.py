@@ -23,7 +23,6 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
          #tworzy nowego użytkownika za pomoca modelu User 
-         #pan mowi ze to bezpieczne XD
         user = User.objects.create_user(**validated_data)
         return user
         
@@ -71,7 +70,6 @@ class ChapterSerializer(serializers.ModelSerializer):
         return f"{minutes}:{seconds:02d}"
     
     def get_audio_file(self, obj):
-        """Zwraca pełny URL do pliku audio"""
         if obj.audio_file:
             request = self.context.get('request')
             if request:
@@ -80,12 +78,11 @@ class ChapterSerializer(serializers.ModelSerializer):
         return None
 
 class AudiobookListSerializer(serializers.ModelSerializer):
-    """Uproszczony serializer dla listy audiobooków"""
     author_name = serializers.CharField(source='author.name', read_only=True)
     category_name = serializers.CharField(source='category.name', read_only=True)
     average_rating = serializers.SerializerMethodField()
     is_in_library = serializers.SerializerMethodField()
-    is_purchased = serializers.SerializerMethodField()  # Czy użytkownik kupił
+    is_purchased = serializers.SerializerMethodField()
     
     class Meta:
         model = Audiobook
@@ -108,7 +105,6 @@ class AudiobookListSerializer(serializers.ModelSerializer):
         return False
     
     def get_is_purchased(self, obj):
-        """Sprawdza czy użytkownik kupił ten audiobook"""
         request = self.context.get('request')
         if request and request.user.is_authenticated:
             return Purchase.objects.filter(
@@ -120,7 +116,6 @@ class AudiobookListSerializer(serializers.ModelSerializer):
 
 
 class PurchaseSerializer(serializers.ModelSerializer):
-    """Serializer dla zakupów"""
     audiobook_title = serializers.CharField(source='audiobook.title', read_only=True)
     audiobook_author = serializers.CharField(source='audiobook.author.name', read_only=True)
     audiobook_cover = serializers.CharField(source='audiobook.cover_image', read_only=True)
@@ -135,7 +130,6 @@ class PurchaseSerializer(serializers.ModelSerializer):
 
 
 class AudiobookDetailSerializer(serializers.ModelSerializer):
-    """Szczegółowy serializer dla pojedynczego audiobooka"""
     author = AuthorSerializer(read_only=True)
     category = CategorySerializer(read_only=True)
     chapters = ChapterSerializer(many=True, read_only=True)
